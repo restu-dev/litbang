@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Level extends Model
 {
     // Table
-    protected $table =  'wifi.level';
+    protected $table =  'litbang.level';
 
     protected $guarded = ['id'];
 }

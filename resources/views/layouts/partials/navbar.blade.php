@@ -4,7 +4,8 @@
      <!-- Left navbar links -->
      <ul class="navbar-nav">
          <li class="nav-item">
-             <a class="nav-link" data-widget="pushmenu" href="javascript:void(0)" role="button"><i class="fas fa-bars"></i></a>
+             <a class="nav-link" data-widget="pushmenu" href="javascript:void(0)" role="button"><i
+                     class="fas fa-bars"></i></a>
          </li>
 
          <li class="nav-item d-none d-sm-inline-block">
@@ -15,19 +16,23 @@
              <a href="/pengaturan-password" class="nav-link">Password</a>
          </li> --}}
 
-         {{-- <li class="nav-item d-none d-sm-inline-block">
-             <a href="/git-log" class="nav-link">Git Log</a>
-         </li> --}}
+         @if (session('no_pegawai') == '2100588')
+             <li class="nav-item d-none d-sm-inline-block">
+                 <a href="/git-log" class="nav-link">Git Log</a>
+             </li>
+         @endif
+
 
      </ul>
 
      <!-- Right navbar links -->
      <ul class="navbar-nav ml-auto">
-         <li class="nav-item">
+
+         {{-- <li class="nav-item">
              <a class="nav-link" data-widget="fullscreen" href="javascript:void(0)" role="button">
                  <i class="fas fa-expand-arrows-alt"></i>
              </a>
-         </li>
+         </li> --}}
 
          {{-- <li class="nav-item">
              <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="javascript:void(0)" role="button">

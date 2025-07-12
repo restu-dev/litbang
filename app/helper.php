@@ -14,9 +14,9 @@ function getMenu()
 
     $query1 = DB::select("SELECT m.id AS id_main,a.id_level,a.id_menu,a.yt_tampil,a.yt_add,a.yt_edit,
                             a.yt_del,a.yt_print,m.id,m.url,m.nama AS nama_menu,m.punya_sub,m.icon,l.name AS nama_level 
-                        FROM wifi.akses a
-                        LEFT OUTER JOIN wifi.menu m ON m.id=a.id_menu 
-                        LEFT OUTER JOIN wifi.level l ON l.id=a.id_level
+                        FROM litbang.akses a
+                        LEFT OUTER JOIN litbang.menu m ON m.id=a.id_menu 
+                        LEFT OUTER JOIN litbang.level l ON l.id=a.id_level
                         WHERE m.yt_header='Y' AND a.yt_tampil='Y' AND a.id_level='$level' 
                         ORDER BY m.urut_header +1 ASC;");
 
@@ -60,9 +60,9 @@ function getMenu()
                                     
             $query2 = DB::select("SELECT m.id AS id_main,a.id_level,a.id_menu,a.yt_add,a.yt_edit,
                                         a.yt_del,a.yt_print,m.id,m.url,m.nama AS nama_menu,m.punya_sub,m.icon,l.name AS nama_level 
-                                    FROM wifi.akses a
-                                    LEFT OUTER JOIN wifi.menu m ON m.id=a.id_menu 
-                                    LEFT OUTER JOIN wifi.level l ON l.id=a.id_level
+                                    FROM litbang.akses a
+                                    LEFT OUTER JOIN litbang.menu m ON m.id=a.id_menu 
+                                    LEFT OUTER JOIN litbang.level l ON l.id=a.id_level
                                     WHERE m.yt_parent='Y' AND a.yt_tampil='Y' AND a.id_level='$level' AND id_header='$id_main'
                                     ORDER BY m.urut_parent +1 ASC");
 
@@ -122,7 +122,7 @@ function checkitboxlone($id, $yt)
 
 function infomenu($idmenu, $idlevel)
 {
-    $dt = DB::select("SELECT COUNT(id) AS ada FROM wifi.akses WHERE id_menu='$idmenu' AND id_level='$idlevel'");
+    $dt = DB::select("SELECT COUNT(id) AS ada FROM litbang.akses WHERE id_menu='$idmenu' AND id_level='$idlevel'");
     foreach ($dt as $d) {
         $ada = $d->ada;
     }
@@ -131,7 +131,7 @@ function infomenu($idmenu, $idlevel)
         $hasil = array("akses" => "T", "add" => "T", "edit" => "T", "delete" => "T", "print" => "T");
     } else {
         $result = DB::select("SELECT * 
-                             FROM wifi.akses
+                             FROM litbang.akses
                              WHERE id_menu='$idmenu' 
                              AND id_level='$idlevel'");
         foreach ($result as $d) {

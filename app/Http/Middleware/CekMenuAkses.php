@@ -23,7 +23,7 @@ class CekMenuAkses
         // get id_level
         $results = DB::select("SELECT a.nama_pegawai, a.NIP, b.id_level
                                 FROM simpia.Data_Induk_Pegawai a
-                                LEFT JOIN wifi.user_level b ON a.NIP=b.nip
+                                LEFT JOIN litbang.user_level b ON a.NIP=b.nip
                                 WHERE no_pegawai='$no_pegawai'");
 
         $id_level = $results[0]->id_level;

@@ -17,8 +17,11 @@ use App\Http\Controllers\UserWifiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserAssetController;
 use App\Http\Controllers\KeteranganController;
+use App\Http\Controllers\MasterBidangController;
 use App\Http\Controllers\ReportDataUserController;
 use App\Http\Controllers\ReportJumlahUserController;
+use App\Http\Controllers\MasterJenisKegiatanController;
+use App\Http\Controllers\MasterStatusPencapaianController;
 
 
 
@@ -42,10 +45,30 @@ Route::get('/git-log', [GitLogController::class, 'index'])->name('git-log')->mid
 
 Route::post('tampil-halaman-chart-satu', [DashboardController::class, 'tampilHalamanChartSatu'])->name('tampil-halaman-chart-satu')->middleware('auth');
 Route::post('load-chart-satu', [DashboardController::class, 'loadChartSatu'])->name('load-chart-satu')->middleware('auth');
-// 
 
 
 // == master 
+
+// master_bidang
+Route::get('/master-bidang', [MasterBidangController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-master-bidang', [MasterBidangController::class, 'loadTabelMasterBidang'])->name('load-tabel-master-bidang');
+Route::post('store-master-bidang', [MasterBidangController::class, 'store']);
+Route::post('destroy-master-bidang', [MasterBidangController::class, 'destroy']);
+
+// master-jenis-kegiatan
+Route::get('/master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'loadTabelMasterJenisKegiatan'])->name('load-tabel-master-jenis-kegiatan');
+Route::post('store-master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'store']);
+Route::post('destroy-master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'destroy']);
+
+// master-status-pencapaian
+Route::get('/master-status-pencapaian', [MasterStatusPencapaianController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-master-status-pencapaian', [MasterStatusPencapaianController::class, 'loadTabelMasterStatusPencapaian'])->name('load-tabel-master-status-pencapaian');
+Route::post('store-master-status-pencapaian', [MasterStatusPencapaianController::class, 'store']);
+Route::post('destroy-master-status-pencapaian', [MasterStatusPencapaianController::class, 'destroy']);
+
+
+
 // master keterangan
 Route::get('/keterangan', [KeteranganController::class, 'index'])->name('keterangan')->middleware('auth');
 Route::post('load-table-keterangan', [KeteranganController::class, 'loadTableKeterangan'])->name('load-table-keterangan')->middleware('auth');
@@ -80,7 +103,6 @@ Route::get('/report-jumlah-user', [ReportJumlahUserController::class, 'index'])-
 Route::post('load-tampil-data-report-jumlah-user', [ReportJumlahUserController::class, 'loadTampilDataReportJumlahUser'])->name('load-tampil-data-report-jumlah-user')->middleware('auth');
 Route::post('load-table-detail-data-user', [ReportJumlahUserController::class, 'loadTableDetailDataUser'])->name('load-table-detail-data-user')->middleware('auth');
 Route::post('load-table-detail-data-asset', [ReportJumlahUserController::class, 'loadTableDetailDataAsset'])->name('load-table-detail-data-asset')->middleware('auth');
-
 
 // select
 Route::post('get-jenis-perangkat', [SelectController::class, 'getJenisPerangkat'])->name('get-jenis-perangkat')->middleware('auth');

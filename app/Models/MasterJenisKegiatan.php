@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserLevel extends Model
+class MasterJenisKegiatan extends Model
 {
     // Table
-    protected $table =  'litbang.user_level';
+    protected $table =  'litbang.master_jenis_kegiatan';
 
     protected $guarded = ['id'];
 }

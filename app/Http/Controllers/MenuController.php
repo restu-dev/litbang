@@ -18,7 +18,7 @@ class MenuController extends Controller
 
     public function loadTabelMenuHeader()
     {
-        $results = DB::select("SELECT * FROM wifi.menu
+        $results = DB::select("SELECT * FROM litbang.menu
                             WHERE yt_header='Y'
                             ORDER BY urut_header + 0 ASC");
 
@@ -29,7 +29,7 @@ class MenuController extends Controller
     {   
         $id_header = $request->id_header;
 
-        $results = DB::select("SELECT * FROM wifi.menu
+        $results = DB::select("SELECT * FROM litbang.menu
                             WHERE yt_parent='Y'
                             AND id_header='$id_header'
                             ORDER BY urut_parent + 0 ASC");

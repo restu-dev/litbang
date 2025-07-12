@@ -20,7 +20,7 @@ class UserController extends Controller
      public function jumlahLevel($id_level)
      {
         $data = DB::select("SELECT COUNT(id) AS jumlah 
-                            FROM wifi.user_level
+                            FROM litbang.user_level
                             WHERE id_level='$id_level'");
 
         $jumlah = "0";
@@ -63,8 +63,8 @@ class UserController extends Controller
     public function namaLevel($nip)
     {
         $data = DB::select("SELECT a.nip,a.id_level,b.name AS nama_level
-                FROM wifi.user_level a
-                LEFT JOIN wifi.level b ON a.id_level=b.id
+                FROM litbang.user_level a
+                LEFT JOIN litbang.level b ON a.id_level=b.id
                 WHERE a.nip='$nip'");
 
 
@@ -84,7 +84,7 @@ class UserController extends Controller
     public function namaBidang($nip)
     {
         $data = DB::select("SELECT a.nip,a.id_level,b.nama AS nama_bidang_isct
-                FROM wifi.user_level a
+                FROM litbang.user_level a
                 LEFT JOIN simpia.Bidang_Isct b ON a.id_bidang_isct=b.id
                 WHERE a.nip='$nip'");
 
@@ -131,7 +131,7 @@ class UserController extends Controller
                                     WHERE resign IS NULL OR resign=''
                                 ) AS k ON p.no_pegawai=k.no_pegawai
                                 LEFT JOIN simpia.users ur ON ur.no_pegawai=p.no_pegawai
-                                LEFT JOIN wifi.user_level ul ON p.NIP=ul.nip
+                                LEFT JOIN litbang.user_level ul ON p.NIP=ul.nip
                                 WHERE tanggal_penempatan LIKE (SELECT MAX(tanggal_penempatan) FROM simpia.Penempatan_Kerja_Pegawai WHERE no_pegawai=p.no_pegawai)
                                 AND  ur.status_ajukan_user='YA'
                                 {$Flevel}

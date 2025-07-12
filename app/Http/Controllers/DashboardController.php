@@ -45,7 +45,7 @@ class DashboardController extends Controller
                                     WHERE resign IS NULL OR resign=''
                                 ) AS k ON p.no_pegawai=k.no_pegawai
                                 LEFT JOIN simpia.users ur ON ur.no_pegawai=p.no_pegawai
-                                LEFT JOIN wifi.user_level ul ON p.NIP=ul.nip
+                                LEFT JOIN litbang.user_level ul ON p.NIP=ul.nip
                                 WHERE tanggal_penempatan LIKE (SELECT MAX(tanggal_penempatan) FROM simpia.Penempatan_Kerja_Pegawai WHERE no_pegawai=p.no_pegawai)
                                 AND ul.id_level <> ''
                                 GROUP BY id_pegawai

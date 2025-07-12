@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
             $no_pegawai = $user->no_pegawai;
             $nip = DB::table('simpia.Data_Induk_Pegawai')->where('no_pegawai', $no_pegawai)->first()->NIP;
 
-            $id_level = DB::table('wifi.user_level')->where('nip', $nip)->first()->id_level;
+            $id_level = DB::table('litbang.user_level')->where('nip', $nip)->first()->id_level;
 
             if ($id_level == 1) {
                 return true;

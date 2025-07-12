@@ -5,7 +5,7 @@
     <script src="/login_template/js/color-modes.js"></script>
 
     <meta charset="utf-8">
-    <title>Login | Jaringan</title>
+    <title>Login | LITBANG PIA</title>
 
     <link href="login_template/css/bootstrap.min.css" rel="stylesheet">
 
@@ -164,7 +164,7 @@
             </div>
 
             <h1 style="margin-top: -10px" class="h3 mb-1 text-center fw-normal">Login Form</h1>
-            <p class="mb-3 text-center fw-normal">Jaringan</p>
+            <p class="mb-3 text-center fw-normal">LITBANG</p>
 
             @if (session()->has('loginError'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
