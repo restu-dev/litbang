@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Level;
+use App\Models\MasterBidang;
 use App\Models\UserLevel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -168,6 +169,9 @@ class LoginController extends Controller
                 $request->session()->regenerate();
                 $nama_level = Level::where('id', $level)->first()->name;
 
+                $id_bidang = UserLevel::where('nip',$nip)->first()->id_bidang??"";
+                $nama_bidang = MasterBidang::where('id', $id_bidang)->first()->nama??"";
+
                 session([
                     'level' => $level,
                     'nama_level' => $nama_level,
@@ -177,6 +181,8 @@ class LoginController extends Controller
                     'nama_unit' => $nama_unit,
                     'nama_pegawai' => $nama_pegawai,
                     'no_pegawai' => $no_pegawai,
+                    'id_bidang' => $id_bidang,
+                    'nama_bidang' => $nama_bidang,
                     'nip' => $nip,
                 ]);
 

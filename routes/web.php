@@ -17,10 +17,12 @@ use App\Http\Controllers\UserWifiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserAssetController;
 use App\Http\Controllers\KeteranganController;
+use App\Http\Controllers\JurnalHarianController;
 use App\Http\Controllers\MasterBidangController;
 use App\Http\Controllers\ReportDataUserController;
 use App\Http\Controllers\ReportJumlahUserController;
 use App\Http\Controllers\MasterJenisKegiatanController;
+use App\Http\Controllers\ProgramKerjaTahunanController;
 use App\Http\Controllers\MasterStatusPencapaianController;
 
 
@@ -45,6 +47,23 @@ Route::get('/git-log', [GitLogController::class, 'index'])->name('git-log')->mid
 
 Route::post('tampil-halaman-chart-satu', [DashboardController::class, 'tampilHalamanChartSatu'])->name('tampil-halaman-chart-satu')->middleware('auth');
 Route::post('load-chart-satu', [DashboardController::class, 'loadChartSatu'])->name('load-chart-satu')->middleware('auth');
+
+
+// == kerja
+
+// program-kerja-tahunan
+Route::get('/program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'loadTabelProgramKerjaTahunan'])->name('load-tabel-program-kerja-tahunan');
+Route::post('simpan-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'simpanProgramKerjaTahunan']);
+Route::post('get-data-edit-program-kerja-tahunan-by-id', [ProgramKerjaTahunanController::class, 'getDataEditProgramKerjaTahunanById']);
+Route::post('destroy-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'destroy']);
+
+// jurnal-harian
+Route::get('/jurnal-harian', [JurnalHarianController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-jurnal-harian', [JurnalHarianController::class, 'loadTabelJurnalHarian'])->name('load-tabel-jurnal-harian');
+Route::post('simpan-jurnal-harian', [JurnalHarianController::class, 'simpanJurnalHarian']);
+Route::post('get-data-edit-jurnal-harian-by-id', [JurnalHarianController::class, 'getDataEditJurnalHarianById']);
+Route::post('destroy-jurnal-harian', [JurnalHarianController::class, 'destroy']);
 
 
 // == master 
@@ -105,12 +124,11 @@ Route::post('load-table-detail-data-user', [ReportJumlahUserController::class, '
 Route::post('load-table-detail-data-asset', [ReportJumlahUserController::class, 'loadTableDetailDataAsset'])->name('load-table-detail-data-asset')->middleware('auth');
 
 // select
-Route::post('get-jenis-perangkat', [SelectController::class, 'getJenisPerangkat'])->name('get-jenis-perangkat')->middleware('auth');
-Route::post('get-nama-pegawai', [SelectController::class, 'getNamaPegawai'])->name('get-nama-pegawai')->middleware('auth');
-Route::post('get-anggaran-rab', [SelectController::class, 'getAnggaranRab'])->name('get-anggaran-rab')->middleware('auth');
-Route::post('get-anggaran-rab-detail', [SelectController::class, 'getAnggaranRabDetail'])->name('get-anggaran-rab-detail')->middleware('auth');
+Route::post('select-bidang', [SelectController::class, 'getBidang'])->name('select-bidang')->middleware('auth');
+Route::post('select-jenis-kegiatan', [SelectController::class, 'getJenisKegiatan'])->name('select-jenis-kegiatan')->middleware('auth');
+Route::post('select-status-capaian', [SelectController::class, 'getStatusCapaian'])->name('select-status-capaian')->middleware('auth');
+Route::post('select-program-kerja-by-user', [SelectController::class, 'getProgramKerjaByUser'])->name('select-program-kerja-by-user')->middleware('auth');
 
-// select
 Route::post('/select-nama-pegawai', [SelectController::class, 'namaPegawai'])->name('nama-pegawai')->middleware('auth');
 Route::post('/select-nama-asset', [SelectController::class, 'namaAsset'])->name('select-nama-asset')->middleware('auth');
 

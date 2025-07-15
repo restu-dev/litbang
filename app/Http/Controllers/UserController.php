@@ -42,7 +42,7 @@ class UserController extends Controller
             $data_level[$i]->jumlah = $this->jumlahLevel($id_level);
         }
 
-        $data_bidang = DB::select("SELECT * FROM simpia.Bidang_Isct");
+        $data_bidang = DB::select("SELECT * FROM litbang.master_bidang");
 
         return view('user.index', compact('title', 'active','data_level', 'data_bidang'));
     }
@@ -83,21 +83,21 @@ class UserController extends Controller
 
     public function namaBidang($nip)
     {
-        $data = DB::select("SELECT a.nip,a.id_level,b.nama AS nama_bidang_isct
-                FROM litbang.user_level a
-                LEFT JOIN simpia.Bidang_Isct b ON a.id_bidang_isct=b.id
-                WHERE a.nip='$nip'");
+        $data = DB::select("SELECT a.nip,a.id_level,b.nama AS nama_bidang
+                            FROM litbang.user_level a
+                            LEFT JOIN litbang.master_bidang b ON a.id_bidang=b.id
+                            WHERE a.nip='$nip'");
 
-        $id_bidang_isct = "";
-        $nama_bidang_isct = "Bidang belum disetting";
+        $id_bidang = "";
+        $nama_bidang = "Bidang belum disetting";
 
         if (!empty($data)) {
-            $id_bidang_isct = $data[0]->id_bidang_isct??"";
-            $nama_bidang_isct = $data[0]->nama_bidang_isct?? "Bidang belum disetting";
+            $id_bidang = $data[0]->id_bidang??"";
+            $nama_bidang = $data[0]->nama_bidang?? "Bidang belum disetting";
         }
 
-        $hasil['id_bidang_isct'] = $id_bidang_isct;
-        $hasil['nama_bidang_isct'] = empty($nama_bidang_isct) ? "Bidang belum disetting" : $nama_bidang_isct;
+        $hasil['id_bidang'] = $id_bidang;
+        $hasil['nama_bidang'] = empty($nama_bidang) ? "Bidang belum disetting" : $nama_bidang;
 
         return $hasil;
     }
@@ -152,7 +152,9 @@ class UserController extends Controller
             $results[$i]->nama_level = $nama_level;
 
             $bidang = $this->namaBidang($nip);
-            $nama_bidang_isct = $bidang["nama_bidang_isct"];
+            $nama_bidang = $bidang["nama_bidang"];
+
+             $results[$i]->nama_bidang = $nama_bidang;
             
 
             if ($nama_level == "Belum memiliki akses") {
@@ -161,7 +163,7 @@ class UserController extends Controller
             } else {
                 $fa = "btn-success";
                 $detail_aksei = "<a data-nip='$nip' data-idpegawai='$idpegawai' data-level='$nama_level' class='edit_akses dropdown-item' href='javascript: void(0)'>Edit Akses</a>
-                                 <a data-nip='$nip' data-idpegawai='$idpegawai' data-bidang='$nama_bidang_isct' class='edit_bidang_isct dropdown-item' href='javascript: void(0)'>Add Bidang</a>
+                                 <a data-nip='$nip' data-idpegawai='$idpegawai' data-bidang='$nama_bidang' class='edit_bidang dropdown-item' href='javascript: void(0)'>Add Bidang</a>
                                  <a data-nip='$nip' data-idpegawai='$idpegawai' class='hapus_akses dropdown-item' href='javascript: void(0)'>Hapus Akses</a>";
             }
 
@@ -232,7 +234,7 @@ class UserController extends Controller
 
         // ada data => update
         $data->update([
-            'id_bidang_isct' => $idbidang
+            'id_bidang' => $idbidang
         ]);
 
         return response()->json([

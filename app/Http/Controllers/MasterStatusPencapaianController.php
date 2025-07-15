@@ -11,7 +11,7 @@ class MasterStatusPencapaianController extends Controller
 {
     public function index()
     {
-        $title = 'Master Jenis Kegiatan';
+        $title = 'Master Status Pencapaian';
         $active = 'master-status-pencapaian';
 
         return view('master-status-pencapaian.index', compact('title', 'active'));

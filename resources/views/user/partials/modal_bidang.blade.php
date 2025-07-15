@@ -19,7 +19,7 @@
                         <option value="">-Pilih Bidang-</option>
 
                         @foreach ($data_bidang as $data)
-                            <option value="{{ $data->id }}">[{{ $data->kode }}] {{ $data->nama }}</option>
+                            <option value="{{ $data->id }}">{{ $data->nama }}</option>
                         @endforeach
                     </select>
                 </div>

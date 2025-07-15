@@ -53,6 +53,7 @@
                                  <th>No</th>
                                  <th>Aksi</th>
                                  <th>Level</th>
+                                 <th>Bidang</th>
                                  <th>Unit</th>
                                  <th>NIP</th>
                                  <th>Nama</th>
@@ -104,6 +105,10 @@
                              },
                              {
                                  data: 'nama_level',
+                                 className: "text-left",
+                             },
+                             {
+                                 data: 'nama_bidang',
                                  className: "text-left",
                              },
                              {
@@ -195,7 +200,7 @@
                  }
              });
 
-               $(document).on("click", ".edit_bidang_isct", function(e) {
+               $(document).on("click", ".edit_bidang", function(e) {
                  var nip = $(this).data("nip");
                  var bidang = $(this).data("bidang");
 

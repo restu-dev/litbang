@@ -36,6 +36,12 @@ class SelectController extends Controller
         $this->helper = $helper;
     }
 
+    public function namaAsset()
+    {
+        $values = \DB::select("SELECT id as id, id as text FROM assets.Eq_Asset WHERE deleted='N' ORDER BY id DESC");
+        return $values;
+    }
+
     public function namaPegawai()
     {
         $results = \DB::select("SELECT d.no_pegawai AS id,
@@ -61,11 +67,40 @@ class SelectController extends Controller
         return $results;
     }
 
-    public function namaAsset()
+    public function getBidang()
     {
-        $values = \DB::select("SELECT id as id, id as text FROM assets.Eq_Asset WHERE deleted='N' ORDER BY id DESC");
+        $values = \DB::select("SELECT id as id, nama as text 
+                               FROM litbang.master_bidang 
+                               ORDER BY nama ASC");
         return $values;
     }
+
+    public function getJenisKegiatan()
+    {
+        $values = \DB::select("SELECT id as id, nama as text 
+                               FROM litbang.master_jenis_kegiatan 
+                               ORDER BY nama ASC");
+        return $values;
+    }
+
+    public function getStatusCapaian()
+    {
+        $values = \DB::select("SELECT id as id, nama as text 
+                               FROM litbang.master_status_pencapaian 
+                               ORDER BY nama ASC");
+        return $values;
+    }
+
+    public function getProgramKerjaByUser()
+    {
+        $no_pegawai = session('no_pegawai');
+        $values = \DB::select("SELECT id as id, program_kerja as text 
+                               FROM litbang.program_kerja_tahunan
+                               WHERE penanggung_jawab = '$no_pegawai' 
+                               ORDER BY program_kerja ASC");
+        return $values;
+    }
+
 
   
 
