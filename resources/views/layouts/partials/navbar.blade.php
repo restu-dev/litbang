@@ -16,11 +16,15 @@
              <a href="/pengaturan-password" class="nav-link">Password</a>
          </li> --}}
 
-         @if (session('no_pegawai') == '2100588')
+         @if (session('no_pegawai') == '21000588')
              <li class="nav-item d-none d-sm-inline-block">
                  <a href="/git-log" class="nav-link">Git Log</a>
              </li>
          @endif
+
+         <li class="nav-item d-none d-sm-inline-block">
+             <a href="/ubah-password" class="nav-link">Ubah Password</a>
+         </li>
 
 
      </ul>

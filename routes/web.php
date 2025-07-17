@@ -24,6 +24,7 @@ use App\Http\Controllers\ReportDataUserController;
 use App\Http\Controllers\ReportJumlahUserController;
 use App\Http\Controllers\MasterJenisKegiatanController;
 use App\Http\Controllers\ProgramKerjaTahunanController;
+use App\Http\Controllers\MasterTahunPelajaranController;
 use App\Http\Controllers\MasterStatusPencapaianController;
 
 
@@ -49,6 +50,10 @@ Route::get('/git-log', [GitLogController::class, 'index'])->name('git-log')->mid
 Route::post('tampil-halaman-chart-satu', [DashboardController::class, 'tampilHalamanChartSatu'])->name('tampil-halaman-chart-satu')->middleware('auth');
 Route::post('load-chart-satu', [DashboardController::class, 'loadChartSatu'])->name('load-chart-satu')->middleware('auth');
 
+// ganti-password
+Route::get('/ubah-password', [DashboardController::class, 'ubahPassword'])->middleware('auth');
+Route::post('/simpan-ubah-password', [DashboardController::class, 'simpanUbahPassword'])->middleware('auth');
+
 
 // == kerja
 
@@ -65,8 +70,6 @@ Route::get('/approval', [ApprovalController::class, 'index'])->middleware('auth'
 Route::post('load-tabel-approval', [ApprovalController::class, 'loadTabelProgramKerjaTahunanApprov'])->name('load-tabel-approval');
 Route::post('simpan-approval', [ApprovalController::class, 'simpanApproval']);
 
-
-
 // jurnal-harian
 Route::get('/jurnal-harian', [JurnalHarianController::class, 'index'])->middleware('auth');
 Route::post('load-tabel-jurnal-harian', [JurnalHarianController::class, 'loadTabelJurnalHarian'])->name('load-tabel-jurnal-harian');
@@ -76,6 +79,13 @@ Route::post('destroy-jurnal-harian', [JurnalHarianController::class, 'destroy'])
 
 
 // == master 
+
+// master-tahun-pelajaran
+Route::get('/master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'loadTabelMasterTahunPelajaran'])->name('load-tabel-master-tahun-pelajaran');
+Route::post('store-master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'store']);
+Route::post('destroy-master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'destroy']);
+
 
 // master_bidang
 Route::get('/master-bidang', [MasterBidangController::class, 'index'])->middleware('auth');
@@ -94,7 +104,6 @@ Route::get('/master-status-pencapaian', [MasterStatusPencapaianController::class
 Route::post('load-tabel-master-status-pencapaian', [MasterStatusPencapaianController::class, 'loadTabelMasterStatusPencapaian'])->name('load-tabel-master-status-pencapaian');
 Route::post('store-master-status-pencapaian', [MasterStatusPencapaianController::class, 'store']);
 Route::post('destroy-master-status-pencapaian', [MasterStatusPencapaianController::class, 'destroy']);
-
 
 
 // master keterangan

@@ -207,4 +207,112 @@ class DashboardController extends Controller
         return $return;
     }
 
+    public function ubahPassword()
+    {
+        $title = 'Ubah Password';
+        $active = 'ubah-password';
+
+        return view('dashboard.ubah-password', compact('title', 'active'));
+    }
+
+    public function simpanUbahPassword(Request $request)
+    {
+        $nip        = session('nip');
+        $pass_lama  = $request->pass_lama;
+        $pass_baru  = $request->pass_baru;
+        $aplikasi   = "Litbang";
+
+        DB::beginTransaction();
+
+        try {
+
+            $lanjut = true;
+            $sukses = "Y";
+            $pesan  = "Berhasil ubah password..";
+
+            // ambil no_pegawai
+            $no_pegawai = \DB::table('simpia.Data_Induk_Pegawai')->where('NIP', $nip)->first()->no_pegawai ?? "";
+
+            if ($lanjut) {
+                if (empty($nip)) {
+                    $lanjut = false;
+                    $sukses = "T";
+                    $pesan  = "Gagal, NIP tidak ditemukan!";
+                }
+            }
+
+            $db_pass = \DB::table('simpia.users')->where('no_pegawai', $no_pegawai)->first()->password2 ?? "";
+
+            if ($lanjut) {
+                if (empty($db_pass)) {
+                    $lanjut = false;
+                    $sukses = "T";
+                    $pesan  = "Gagal, memperbarui password!";
+                }
+            }
+
+            if ($lanjut) {
+                if (strlen($pass_baru) <= 6) {
+                    $lanjut = false;
+                    $sukses = "T";
+                    $pesan  = "Password Baru tidak boleh <= 6 karakter";
+                }
+            }
+
+            if ($lanjut) {
+                if (!password_verify($pass_lama, $db_pass)) {
+                    $lanjut = false;
+                    $sukses = "T";
+                    $pesan  = "Gagal, Password Lama Tidak Sesuai!";
+                }
+            }
+
+            if ($lanjut) {
+                if (password_verify($pass_baru, $db_pass)) {
+                    $lanjut = false;
+                    $sukses = "T";
+                    $pesan  = "Gagal, Password Baru Tidak Boleh Sama Dengan Password Lama!";
+                }
+            }
+
+            $hashed_pass = password_hash($pass_baru, PASSWORD_DEFAULT);
+
+            if ($lanjut) {
+
+                // ubah password
+                DB::table('simpia.users')->where('no_pegawai', $no_pegawai)->update([
+                    "password2" => $hashed_pass,
+                ]);
+
+                // simpan log
+                DB::table('simpia.Log_Reset_Pass_Karyawan')->insert([
+                    "no_pegawai" => $no_pegawai,
+                    "nama_aplikasi" => $aplikasi,
+                    "pesan" => $pesan
+                ]);
+            }
+
+            DB::commit();
+            
+            $hasil = array(
+                "sukses" => $sukses,
+                "pesan" => $pesan,
+            );
+
+            return response()->json($hasil);
+        } catch (\Exception $e) {
+            DB::rollback();
+            $pesan = $e->getMessage();
+            $baris = $e->getLine();
+
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => $pesan . '-' . $baris,
+            );
+
+            return response()->json($hasil);
+        }
+    
+    }
+
 }
