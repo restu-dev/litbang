@@ -181,10 +181,19 @@
                                  _token: '{{ csrf_token() }}'
                              },
                              success: function(result) {
-                                 console.log(result);
-                                 loadTabeMaster();
-                                 $('.loader').hide();
-                                 tampilPesan(result.status, result.message);
+                                 var sukses = result.sukses;
+                                 var pesan = result.pesan;
+
+                                 if (sukses == "Y") {
+                                     loadTabeMaster();
+                                     $('.loader').hide();
+                                     tampilPesan('success', pesan);
+                                     resetForm();
+
+                                 } else {
+                                     $('.loader').hide();
+                                     tampilPesan('error', pesan);
+                                 }
                              },
                              fail: function(xhr, textStatus, errorThrown) {
                                  $('.loader').hide();

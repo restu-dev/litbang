@@ -136,9 +136,12 @@ class ProgramKerjaTahunanController extends Controller
         $id = $request->id;
 
         $data = ProgramKerjaTahunan::where('id', $id)->first();
+        $no_pegawai = $data->penanggung_jawab;
+        $nama_pegawai = DB::table('simpia.Data_Induk_Pegawai')->where('no_pegawai',$no_pegawai)->first()->nama_pegawai;
 
         $data['program_kerja'] = $data->program_kerja;
         $data['penanggung_jawab'] = $data->penanggung_jawab;
+        $data['nama_penanggung_jawab'] = $nama_pegawai;
         $data['target_frekuensi_tahunan'] = $data->target_frekuensi_tahunan;
         $data['indikator_kinerja'] = $data->indikator_kinerja;
         $data['capaian_aktual'] = $data->capaian_aktual;
@@ -152,11 +155,42 @@ class ProgramKerjaTahunanController extends Controller
 
     public function destroy(Request $request)
     {
-        ProgramKerjaTahunan::destroy($request->id);
+        $usedIn = [];
+        $id = $request->id;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => "Deleted!",
-        ]);
+        // Cek di jurnal_harian
+        if (DB::table('jurnal_harian')->where('id_program_kerja_tahunan', $id)->exists()) {
+            $usedIn[] = 'jurnal_harian';
+        }
+
+        // Jika ada yang pakai, gagalkan penghapusan
+        if (!empty($usedIn)) {
+
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => 'Gagal dihapus: Data digunakan di tabel: ' . implode(', ', $usedIn)
+            );
+
+            return $hasil;
+        }
+
+        // Hapus jika aman
+        $deleted = ProgramKerjaTahunan::where('id', $id)->delete();
+
+        if ($deleted) {
+            $hasil = array(
+                'sukses' => 'Y',
+                'pesan' => 'Data berhasil dihapus'
+            );
+
+            return $hasil;
+        } else {
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => 'Data tidak ditemukan'
+            );
+
+            return $hasil;
+        }
     }
 }

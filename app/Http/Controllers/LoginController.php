@@ -72,6 +72,7 @@ class LoginController extends Controller
             $nama_unit = $ck->nama_unit;
             $no_pegawai = $ck->no_pegawai;
             $nip = $ck->NIP;
+            $id_struktur = $ck->id_struktur;
         }
 
         if ($lanjut) {
@@ -123,7 +124,8 @@ class LoginController extends Controller
         $nama_unit = empty($nama_unit) ? '' : $nama_unit;
         $no_pegawai = empty($no_pegawai) ? '' : $no_pegawai;
         $nip = empty($nip) ? '' : $nip;
-
+        $id_struktur = empty($id_struktur) ? '' : $id_struktur;
+        
         return array(
             "sukses" => $sukses,
             "pesan" => $pesan,
@@ -135,7 +137,8 @@ class LoginController extends Controller
             "nama_jenjang" => $nama_jenjang,
             "nama_unit" => $nama_unit,
             "no_pegawai" => $no_pegawai,
-            "nip" => $nip
+            "nip" => $nip,
+            "id_struktur" => $id_struktur
         );
     }
 
@@ -161,6 +164,7 @@ class LoginController extends Controller
         $nama_unit = $checklogin['nama_unit'];
         $no_pegawai = $checklogin['no_pegawai'];
         $nip = $checklogin['nip'];
+        $id_struktur = $checklogin['id_struktur'];
 
         if ($sukses == "Y") {
             $cek = ['user' => $user_final, 'password' => $request->password];
@@ -184,6 +188,7 @@ class LoginController extends Controller
                     'id_bidang' => $id_bidang,
                     'nama_bidang' => $nama_bidang,
                     'nip' => $nip,
+                    'id_struktur' => $id_struktur,
                 ]);
 
                 $jam = now();

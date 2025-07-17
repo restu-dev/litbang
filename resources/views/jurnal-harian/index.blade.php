@@ -489,7 +489,7 @@
                              $("#id_program_kerja_tahunan").val(e.id_program_kerja_tahunan).trigger(
                                  "change");
                              $("#id_status_pencapaian").val(e.id_status_pencapaian).trigger("change");
-                             $("#id_jenis_kegiatan").val(e.id_status_pencapaian).trigger("change");
+                             $("#id_jenis_kegiatan").val(e.id_jenis_kegiatan).trigger("change");
                              $("#uraian_kegiatan").val(e.uraian_kegiatan);
                              $("#output_dokumen").val(e.output_dokumen);
                              $("#tanggal_mulai").val(e.tanggal_mulai);

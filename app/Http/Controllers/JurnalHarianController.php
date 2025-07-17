@@ -109,6 +109,9 @@ class JurnalHarianController extends Controller
                 "keterangan" => $keterangan
             ];
 
+            $idProgram = $id_program_kerja_tahunan;
+            $statusBaru = $id_status_pencapaian;
+
             // Simpan file_dokumen (PDF)
             if ($request->hasFile('file_dokumen')) {
                 $request->validate([
@@ -140,6 +143,18 @@ class JurnalHarianController extends Controller
 
                 JurnalHarian::insert($data);
 
+                if ($statusBaru == '1') {
+                    DB::table('program_kerja_tahunan')->where('id', $idProgram)->increment('capaian_aktual');
+                }
+
+                // ✅ Update pro_capaian
+                $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
+                $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
+
+                DB::table('program_kerja_tahunan')
+                ->where('id', $idProgram)
+                ->update(['pro_capaian' => $proCapaian]);
+
                 DB::commit();
                 $hasil = array(
                     'sukses' => 'Y',
@@ -150,8 +165,30 @@ class JurnalHarianController extends Controller
                 $data['user_updated']  = session('no_pegawai');
                 $data['updated_at']    = date('Y-m-d H:i:s');
 
+                // ✅ MODE EDIT
+                $jurnalLama = DB::table('jurnal_harian')->where('id', $id)->first();
+                $statusLama = $jurnalLama->id_status_pencapaian;
+
                 // update
                 JurnalHarian::where('id', $id)->update($data);
+
+                // 🔁 Perubahan status dari done ke bukan done
+                if ($statusLama == '1' && $statusBaru != '1') {
+                    DB::table('program_kerja_tahunan')->where('id', $idProgram)->decrement('capaian_aktual');
+                }
+
+                // 🔁 Perubahan status dari bukan done ke done
+                if ($statusLama != '1' && $statusBaru == '1') {
+                    DB::table('program_kerja_tahunan')->where('id', $idProgram)->increment('capaian_aktual');
+                }
+
+                // ✅ Update pro_capaian
+                $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
+                $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
+
+                DB::table('program_kerja_tahunan')
+                ->where('id', $idProgram)
+                ->update(['pro_capaian' => $proCapaian]);
 
                 DB::commit();
                 $hasil = array(
@@ -216,8 +253,26 @@ class JurnalHarianController extends Controller
             unlink(public_path('/upload/foto/' . $jurnal->file_foto));
         }
 
+        $jurnal = DB::table('jurnal_harian')->where('id', $id)->first();
+        $idProgram = $jurnal->id_program_kerja_tahunan;
+
         // Hapus dari database
         JurnalHarian::where('id', $id)->delete();
+
+        // Jika status = done, kurangi capaian_aktual dan update pro_capaian
+        if ($jurnal->id_status_pencapaian == '1') {
+            DB::table('program_kerja_tahunan')->where('id', $idProgram)->decrement('capaian_aktual');
+
+            // Ambil ulang data
+            $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
+            $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
+
+            DB::table('program_kerja_tahunan')
+            ->where('id', $idProgram)
+                ->update(['pro_capaian' => $proCapaian]);
+        }
+
+
 
         return response()->json(['message' => 'Data berhasil dihapus']);
 

@@ -74,12 +74,49 @@ class MasterBidangController extends Controller
 
     public function destroy(Request $request)
     {
-       
-        MasterBidang::destroy($request->id);
+        $usedIn = [];
+        $id = $request->id;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => "Deleted!",
-        ]);
+        // Cek di user_level
+        if (DB::table('user_level')->where('id_bidang', $id)->exists()) {
+            $usedIn[] = 'user_level';
+        }
+
+        // Cek di jurnal_harian
+        if (DB::table('jurnal_harian')->where('id_bidang', $id)->exists()) {
+            $usedIn[] = 'jurnal_harian';
+        }
+
+        // Jika ada yang pakai, gagalkan penghapusan
+        if (!empty($usedIn)) {
+
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => 'Gagal dihapus: Data digunakan di tabel: ' . implode(', ', $usedIn)
+            );
+
+            return $hasil;
+        }
+
+        // Hapus jika aman
+        $deleted = MasterBidang::where('id', $id)->delete();
+
+        if ($deleted) {
+            $hasil = array(
+                'sukses' => 'Y',
+                'pesan' => 'Data berhasil dihapus'
+            );
+
+            return $hasil;
+          
+        } else {
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => 'Data tidak ditemukan'
+            );
+
+            return $hasil;
+        }
+
     }
 }

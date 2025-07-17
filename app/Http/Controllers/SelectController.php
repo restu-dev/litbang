@@ -97,6 +97,7 @@ class SelectController extends Controller
         $values = \DB::select("SELECT id as id, program_kerja as text 
                                FROM litbang.program_kerja_tahunan
                                WHERE penanggung_jawab = '$no_pegawai' 
+                               AND approvement='Ya'
                                ORDER BY program_kerja ASC");
         return $values;
     }

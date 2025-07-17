@@ -74,12 +74,42 @@ class MasterJenisKegiatanController extends Controller
 
     public function destroy(Request $request)
     {
-       
-        MasterJenisKegiatan::destroy($request->id);
+        $usedIn = [];
+        $id = $request->id;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => "Deleted!",
-        ]);
+        // Cek di jurnal_harian
+        if (DB::table('jurnal_harian')->where('id_jenis_kegiatan', $id)->exists()) {
+            $usedIn[] = 'jurnal_harian';
+        }
+
+        // Jika ada yang pakai, gagalkan penghapusan
+        if (!empty($usedIn)) {
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => 'Gagal dihapus: Data digunakan di tabel: ' . implode(', ', $usedIn)
+            );
+
+            return $hasil;
+        }
+
+        // Hapus jika aman
+        $deleted = MasterJenisKegiatan::where('id', $id)->delete();
+
+        if ($deleted) {
+            $hasil = array(
+                'sukses' => 'Y',
+                'pesan' => 'Data berhasil dihapus'
+            );
+
+            return $hasil;
+        } else {
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => 'Data tidak ditemukan'
+            );
+
+            return $hasil;
+        }
+       
     }
 }

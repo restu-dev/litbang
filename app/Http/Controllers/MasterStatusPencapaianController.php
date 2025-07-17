@@ -74,12 +74,47 @@ class MasterStatusPencapaianController extends Controller
 
     public function destroy(Request $request)
     {
-       
-        MasterStatusPencapaian::destroy($request->id);
+        $usedIn = [];
+        $id = $request->id;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => "Deleted!",
-        ]);
+        // Cek di program_kerja_tahunan
+        if (DB::table('program_kerja_tahunan')->where('id_status_capaian', $id)->exists()) {
+            $usedIn[] = 'program_kerja_tahunan';
+        }
+
+        // Cek di jurnal_harian
+        if (DB::table('jurnal_harian')->where('id_status_pencapaian', $id)->exists()) {
+            $usedIn[] = 'jurnal_harian';
+        }
+
+        // Jika ada yang pakai, gagalkan penghapusan
+        if (!empty($usedIn)) {
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => 'Gagal dihapus: Data digunakan di tabel: ' . implode(', ', $usedIn)
+            );
+
+            return $hasil;
+        }
+
+        // Hapus jika aman
+        $deleted = MasterStatusPencapaian::where('id', $id)->delete();
+
+        if ($deleted) {
+            $hasil = array(
+                'sukses' => 'Y',
+                'pesan' => 'Data berhasil dihapus'
+            );
+
+            return $hasil;
+        } else {
+            $hasil = array(
+                'sukses' => 'T',
+                'pesan' => 'Data tidak ditemukan'
+            );
+
+            return $hasil;
+        }
+       
     }
 }

@@ -13,6 +13,7 @@ use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\GitLogController;
 use App\Http\Controllers\SelectController;
+use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\UserWifiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserAssetController;
@@ -57,6 +58,14 @@ Route::post('load-tabel-program-kerja-tahunan', [ProgramKerjaTahunanController::
 Route::post('simpan-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'simpanProgramKerjaTahunan']);
 Route::post('get-data-edit-program-kerja-tahunan-by-id', [ProgramKerjaTahunanController::class, 'getDataEditProgramKerjaTahunanById']);
 Route::post('destroy-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'destroy']);
+
+// approval
+Route::get('/coba', [ApprovalController::class, 'coba'])->middleware('auth');
+Route::get('/approval', [ApprovalController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-approval', [ApprovalController::class, 'loadTabelProgramKerjaTahunanApprov'])->name('load-tabel-approval');
+Route::post('simpan-approval', [ApprovalController::class, 'simpanApproval']);
+
+
 
 // jurnal-harian
 Route::get('/jurnal-harian', [JurnalHarianController::class, 'index'])->middleware('auth');
