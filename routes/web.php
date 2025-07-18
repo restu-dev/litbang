@@ -22,6 +22,7 @@ use App\Http\Controllers\JurnalHarianController;
 use App\Http\Controllers\MasterBidangController;
 use App\Http\Controllers\ReportDataUserController;
 use App\Http\Controllers\ReportJumlahUserController;
+use App\Http\Controllers\ReportJurnalHarianController;
 use App\Http\Controllers\MasterJenisKegiatanController;
 use App\Http\Controllers\ProgramKerjaTahunanController;
 use App\Http\Controllers\MasterTahunPelajaranController;
@@ -88,8 +89,8 @@ Route::get('/report-program-tahunan', [ReportProgramKerjaTahunanController::clas
 Route::post('load-tabel-report-program-tahunan', [ReportProgramKerjaTahunanController::class, 'loadTabelReportProgramKerjaTahunan'])->name('load-tabel-report-program-tahunan');
 
 // report-jurnal-harian
-Route::get('/report-jurnal-harian', [ReportProgramKerjaTahunanController::class, 'index'])->middleware('auth');
-Route::post('load-tabel-report-jurnal-harian', [ReportProgramKerjaTahunanController::class, 'loadTabelReportProgramKerjaTahunan'])->name('load-tabel-report-jurnal-harian');
+Route::get('/report-jurnal-harian', [ReportJurnalHarianController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-report-jurnal-harian', [ReportJurnalHarianController::class, 'loadTabelReportJurnalHarian'])->name('load-tabel-report-jurnal-harian');
 
 
 // == master 

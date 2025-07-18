@@ -367,7 +367,7 @@
                      });
                  }
 
-                 // load tabel unit
+                 // load tabel
                  function loadTabelData(filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian) {
                      $('.loader').show();
 
