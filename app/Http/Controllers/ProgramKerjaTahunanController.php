@@ -6,22 +6,116 @@ use App\Models\ProgramKerjaTahunan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class ProgramKerjaTahunanController extends Controller
 {
     public function index()
     {
-        $title = 'Program Kerja Tahunan';
+        $no_pegawai = session('no_pegawai');
+        $hariIni = Carbon::now()->toDateString();
+
+        $tahunAjar = DB::table('master_tahun_pelajaran')
+        ->whereDate('awal', '<=', $hariIni)
+        ->whereDate('akhir', '>=', $hariIni)
+        ->first();
+
+        $id_tahun_ajaran = $tahunAjar ? $tahunAjar->id : null;
+        $nama_tahun_ajaran = $tahunAjar ? $tahunAjar->nama : null;
+        $awal = $tahunAjar ? $tahunAjar->awal : null;
+
+        $title = 'Program Kerja Tahunan '. $nama_tahun_ajaran.' - '. session('nama_bidang');;
         $active = 'program-kerja-tahunan';
 
-        return view('program-kerja-tahunan.index', compact('title', 'active'));
+        // Ambil 1 tahun ajaran sebelumnya secara otomatis
+        $tahunLalu="";
+        if($awal){
+            $tahunLalu = DB::table('master_tahun_pelajaran')
+            ->where('awal', '<', $awal)
+            ->orderByDesc('awal')
+            ->first();
+        }
+
+        $id_tahun_ajaran_lalu = $tahunLalu ? $tahunLalu->id : null;
+        $nama_tahun_ajaran_lalu = $tahunLalu ? $tahunLalu->nama : null;
+
+        $adaProgramKerja="";
+        if($id_tahun_ajaran){
+            $adaProgramKerja = DB::table('program_kerja_tahunan')
+            ->where('id_tahun_pelajaran', $id_tahun_ajaran)
+            ->where('penanggung_jawab', $no_pegawai)
+            ->exists();
+        }
+
+        return view('program-kerja-tahunan.index', [
+            'title' => $title,
+            'active' => $active,
+            'tahunAjar' => $tahunAjar,
+            'id_tahun_ajaran' => $id_tahun_ajaran,
+            'nama_tahun_ajaran' => $nama_tahun_ajaran,
+            'id_tahun_ajaran_lalu' => $id_tahun_ajaran_lalu,
+            'nama_tahun_ajaran_lalu' => $nama_tahun_ajaran_lalu,
+            'sudahAdaProgramKerja' => $adaProgramKerja
+        ]);
+    }
+
+    public function cloneDariTahunLalu(Request $request)
+    {
+        $no_pegawai = session('no_pegawai');
+        $id_tahun_lalu = $request->id_tahun_lalu;
+        $id_tahun_sekarang = $request->id_tahun_sekarang;
+
+        // 🔍 Cek apakah data program kerja tahun sekarang sudah ada
+        $sudahAda = DB::table('program_kerja_tahunan')
+        ->where('id_tahun_pelajaran', $id_tahun_sekarang)
+        ->where('penanggung_jawab', $no_pegawai)
+        ->exists();
+
+        if ($sudahAda) {
+            return redirect()->back()->with('error', 'Data program kerja untuk tahun ajaran ini sudah ada. Duplikasi dicegah.');
+        }
+
+        // Ambil data dari tahun lalu
+        $dataTahunLalu = DB::table('program_kerja_tahunan')
+        ->where('id_tahun_pelajaran', $id_tahun_lalu)
+        ->where('penanggung_jawab', $no_pegawai)
+        ->get();
+
+        if ($dataTahunLalu->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data program kerja tahun lalu.');
+        }
+
+        // Lakukan cloning data
+        foreach ($dataTahunLalu as $item) {
+            DB::table('program_kerja_tahunan')->insert([
+                'id_tahun_pelajaran' => $id_tahun_sekarang,
+                'program_kerja' => $item->program_kerja,
+                'penanggung_jawab' => $item->penanggung_jawab,
+                'target_frekuensi_tahunan' => $item->target_frekuensi_tahunan,
+                'indikator_kinerja' => $item->indikator_kinerja,
+                'id_status_capaian' => $item->id_status_capaian,
+                'keterangan' => $item->keterangan,
+                'user_created' => $no_pegawai,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Program kerja dari tahun lalu berhasil disalin.');
     }
 
     // loadTabelProgramKerjaTahunan
     public function loadTabelProgramKerjaTahunan(Request $request)
     {
+        $id_tahun_ajaran = $request->id_tahun_ajaran;
+
         $filter_status_capaian = $request->filter_status_capaian;
         $filter_approvement = $request->filter_approvement;
+        $filter_tahun = $request->filter_tahun;
+
+        $Ftahun = '';
+        if (!empty($filter_tahun)) {
+            $Ftahun = "AND a.id_tahun_pelajaran='$filter_tahun'";
+        }
 
         $Fstatus = '';
         if (!empty($filter_status_capaian)) {
@@ -37,14 +131,18 @@ class ProgramKerjaTahunanController extends Controller
 
         $data = DB::select("SELECT a.*,
                                 b.nama AS nama_status_pencapaian,
-                                c.nama_pegawai
+                                c.nama_pegawai,
+                                d.nama AS nama_tahun_pelajaran
                             FROM program_kerja_tahunan a
                             LEFT JOIN master_status_pencapaian b ON b.id=a.id_status_capaian
                             LEFT JOIN simpia.Data_Induk_Pegawai c ON c.no_pegawai=a.penanggung_jawab
+                            LEFT JOIN litbang.master_tahun_pelajaran d ON d.id=a.id_tahun_pelajaran
                             WHERE a.id <> ''
                             {$Fstatus}
                             {$Fapprove}
+                            {$Ftahun}
                             AND penanggung_jawab='$penanggung_jawab'
+                            AND d.id='$id_tahun_ajaran'
                             ORDER BY created_at ASC");
 
         for($i=0;$i<count($data);$i++){
@@ -69,16 +167,20 @@ class ProgramKerjaTahunanController extends Controller
     public function simpanProgramKerjaTahunan(Request $request)
     {
         $id                         = $request->id;
+        $tahun_pelajaran            = $request->tahun_pelajaran;
         $program_kerja              = $request->program_kerja; 
         $target_frekuensi_tahunan   = $request->target_frekuensi_tahunan; 
         $indikator_kinerja          = $request->indikator_kinerja; 
         $status_capaian             = $request->status_capaian; 
-        $keterangan                 = $request->keterangan; 
+        $keterangan                 = $request->keterangan;
+        $id_bidang                  = session('id_bidang');
 
         DB::beginTransaction();
 
         try {
             $data = [
+                "id_tahun_pelajaran" => $tahun_pelajaran,
+                "id_bidang" => $id_bidang,
                 "program_kerja" => $program_kerja,
                 "penanggung_jawab" => session('no_pegawai'),
                 "target_frekuensi_tahunan" => $target_frekuensi_tahunan,
@@ -139,6 +241,7 @@ class ProgramKerjaTahunanController extends Controller
         $no_pegawai = $data->penanggung_jawab;
         $nama_pegawai = DB::table('simpia.Data_Induk_Pegawai')->where('no_pegawai',$no_pegawai)->first()->nama_pegawai;
 
+        $data['id_tahun_pelajaran'] = $data->id_tahun_pelajaran;
         $data['program_kerja'] = $data->program_kerja;
         $data['penanggung_jawab'] = $data->penanggung_jawab;
         $data['nama_penanggung_jawab'] = $nama_pegawai;

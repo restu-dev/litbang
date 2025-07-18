@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JurnalHarian;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,15 +12,33 @@ class JurnalHarianController extends Controller
 {
     public function index()
     {
-        $title = 'Jurnal Harian - '. session('nama_bidang');
+        $hariIni = Carbon::now()->toDateString();
+
+        $tahunAjar = DB::table('master_tahun_pelajaran')
+        ->whereDate('awal', '<=', $hariIni)
+        ->whereDate('akhir', '>=', $hariIni)
+        ->first();
+
+        $id_tahun_ajaran = $tahunAjar ? $tahunAjar->id : null;
+        $nama_tahun_ajaran = $tahunAjar ? $tahunAjar->nama : null;
+        
+        $title = 'Jurnal Harian '. $nama_tahun_ajaran.' - '. session('nama_bidang');
         $active = 'jurnal-harian';
 
-        return view('jurnal-harian.index', compact('title', 'active'));
+        return view('jurnal-harian.index', [
+            'title' => $title,
+            'active' => $active,
+            'tahunAjar' => $tahunAjar,
+            'id_tahun_ajaran' => $id_tahun_ajaran,
+            'nama_tahun_ajaran' => $nama_tahun_ajaran,
+        ]);
+
     }
 
     // loadTabelJurnalHarian
     public function loadTabelJurnalHarian(Request $request)
     {
+        $id_tahun_ajaran = $request->id_tahun_ajaran;
         $filter_jenis_kegiatan = $request->filter_jenis_kegiatan;
         $filter_program_kerja = $request->filter_program_kerja;
         $filter_status_pencapaian = $request->filter_status_pencapaian;
@@ -47,7 +66,7 @@ class JurnalHarianController extends Controller
                                 c.nama_pegawai,
                                 d.nama AS nama_bidang,
                                 e.nama AS nama_jenis_kegiatan,
-                                f.program_kerja AS nama_program_kerja
+                                f.program_kerja AS nama_program_kerja, f.id_tahun_pelajaran
                             FROM jurnal_harian a
                             LEFT JOIN master_status_pencapaian b ON b.id=a.id_status_pencapaian
                             LEFT JOIN simpia.Data_Induk_Pegawai c ON c.no_pegawai=a.penanggung_jawab
@@ -59,6 +78,11 @@ class JurnalHarianController extends Controller
                             {$Fprogram}
                             {$Fstatus}
                             AND a.penanggung_jawab='$penanggung_jawab'
+                            AND a.id_tahun_pelajaran='$id_tahun_ajaran'
+                            -- AND (
+                            --     a.id_program_kerja_tahunan IS NULL 
+                            --     OR f.id_tahun_pelajaran = '$id_tahun_ajaran'
+                            -- )
                             ORDER BY a.created_at ASC");
 
         for($i=0;$i<count($data);$i++){
@@ -92,7 +116,8 @@ class JurnalHarianController extends Controller
         $tanggal_selesai = $request->tanggal_selesai;
         $id_status_pencapaian = $request->id_status_pencapaian;
         $keterangan = $request->keterangan;
-    
+        $id_tahun_ajaran = $request->id_tahun_ajaran;
+
         DB::beginTransaction();
 
         try {
@@ -106,8 +131,10 @@ class JurnalHarianController extends Controller
                 "tanggal_mulai" => $tanggal_mulai,
                 "tanggal_selesai" => $tanggal_selesai,
                 "id_status_pencapaian" => $id_status_pencapaian,
-                "keterangan" => $keterangan
+                "keterangan" => $keterangan,
+                "id_tahun_pelajaran" => $id_tahun_ajaran
             ];
+
 
             $idProgram = $id_program_kerja_tahunan;
             $statusBaru = $id_status_pencapaian;
@@ -143,17 +170,19 @@ class JurnalHarianController extends Controller
 
                 JurnalHarian::insert($data);
 
-                if ($statusBaru == '1') {
-                    DB::table('program_kerja_tahunan')->where('id', $idProgram)->increment('capaian_aktual');
+                if($idProgram){
+                    if ($statusBaru == '1') {
+                        DB::table('program_kerja_tahunan')->where('id', $idProgram)->increment('capaian_aktual');
+                    }
+
+                    // ✅ Update pro_capaian
+                    $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
+                    $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
+
+                    DB::table('program_kerja_tahunan')
+                    ->where('id', $idProgram)
+                    ->update(['pro_capaian' => $proCapaian]);
                 }
-
-                // ✅ Update pro_capaian
-                $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
-                $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
-
-                DB::table('program_kerja_tahunan')
-                ->where('id', $idProgram)
-                ->update(['pro_capaian' => $proCapaian]);
 
                 DB::commit();
                 $hasil = array(
@@ -165,30 +194,34 @@ class JurnalHarianController extends Controller
                 $data['user_updated']  = session('no_pegawai');
                 $data['updated_at']    = date('Y-m-d H:i:s');
 
-                // ✅ MODE EDIT
-                $jurnalLama = DB::table('jurnal_harian')->where('id', $id)->first();
-                $statusLama = $jurnalLama->id_status_pencapaian;
+                // var_dump($id_program_kerja_tahunan);
+
+                if($idProgram){
+                    // ✅ MODE EDIT
+                    $jurnalLama = DB::table('jurnal_harian')->where('id', $id)->first();
+                    $statusLama = $jurnalLama->id_status_pencapaian;
+
+                    // 🔁 Perubahan status dari done ke bukan done
+                    if ($statusLama == '1' && $statusBaru != '1') {
+                        DB::table('program_kerja_tahunan')->where('id', $idProgram)->decrement('capaian_aktual');
+                    }
+
+                    // 🔁 Perubahan status dari bukan done ke done
+                    if ($statusLama != '1' && $statusBaru == '1') {
+                        DB::table('program_kerja_tahunan')->where('id', $idProgram)->increment('capaian_aktual');
+                    }
+
+                    // ✅ Update pro_capaian
+                    $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
+                    $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
+
+                    DB::table('program_kerja_tahunan')
+                        ->where('id', $idProgram)
+                        ->update(['pro_capaian' => $proCapaian]);
+                }
 
                 // update
                 JurnalHarian::where('id', $id)->update($data);
-
-                // 🔁 Perubahan status dari done ke bukan done
-                if ($statusLama == '1' && $statusBaru != '1') {
-                    DB::table('program_kerja_tahunan')->where('id', $idProgram)->decrement('capaian_aktual');
-                }
-
-                // 🔁 Perubahan status dari bukan done ke done
-                if ($statusLama != '1' && $statusBaru == '1') {
-                    DB::table('program_kerja_tahunan')->where('id', $idProgram)->increment('capaian_aktual');
-                }
-
-                // ✅ Update pro_capaian
-                $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
-                $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
-
-                DB::table('program_kerja_tahunan')
-                ->where('id', $idProgram)
-                ->update(['pro_capaian' => $proCapaian]);
 
                 DB::commit();
                 $hasil = array(
@@ -259,22 +292,20 @@ class JurnalHarianController extends Controller
         // Hapus dari database
         JurnalHarian::where('id', $id)->delete();
 
-        // Jika status = done, kurangi capaian_aktual dan update pro_capaian
-        if ($jurnal->id_status_pencapaian == '1') {
-            DB::table('program_kerja_tahunan')->where('id', $idProgram)->decrement('capaian_aktual');
+        if($idProgram){
+            // Jika status = done, kurangi capaian_aktual dan update pro_capaian
+            if ($jurnal->id_status_pencapaian == '1') {
+                DB::table('program_kerja_tahunan')->where('id', $idProgram)->decrement('capaian_aktual');
 
-            // Ambil ulang data
-            $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
-            $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
+                // Ambil ulang data
+                $program = DB::table('program_kerja_tahunan')->where('id', $idProgram)->first();
+                $proCapaian = ($program->capaian_aktual / max($program->target_frekuensi_tahunan, 1)) * 100;
 
-            DB::table('program_kerja_tahunan')
-            ->where('id', $idProgram)
-                ->update(['pro_capaian' => $proCapaian]);
+                DB::table('program_kerja_tahunan')
+                    ->where('id', $idProgram)
+                    ->update(['pro_capaian' => $proCapaian]);
+            }
         }
-
-
-
-        return response()->json(['message' => 'Data berhasil dihapus']);
 
         return response()->json([
             'status' => 'success',

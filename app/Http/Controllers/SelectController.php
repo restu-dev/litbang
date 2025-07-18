@@ -67,6 +67,14 @@ class SelectController extends Controller
         return $results;
     }
 
+    public function getTahunPelajaran()
+    {
+        $values = \DB::select("SELECT id as id, nama as text 
+                               FROM litbang.master_tahun_pelajaran 
+                               ORDER BY nama ASC");
+        return $values;
+    }
+
     public function getBidang()
     {
         $values = \DB::select("SELECT id as id, nama as text 
@@ -91,13 +99,16 @@ class SelectController extends Controller
         return $values;
     }
 
-    public function getProgramKerjaByUser()
+    public function getProgramKerjaByUser(Request $request)
     {
         $no_pegawai = session('no_pegawai');
+        $id_tahun_ajaran = $request->id_tahun_ajaran;
+
         $values = \DB::select("SELECT id as id, program_kerja as text 
                                FROM litbang.program_kerja_tahunan
                                WHERE penanggung_jawab = '$no_pegawai' 
                                AND approvement='Ya'
+                               AND id_tahun_pelajaran='$id_tahun_ajaran'
                                ORDER BY program_kerja ASC");
         return $values;
     }

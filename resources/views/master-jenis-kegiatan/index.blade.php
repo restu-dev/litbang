@@ -40,7 +40,7 @@
 
                          {{-- nama_master --}}
                          <div class="form-group">
-                             <label for="nama_master">Nama Master</label>
+                             <label for="nama_master">Nama Master <code>*</code></label>
 
                              <input type="text" name="nama_master" class="form-control" id="nama_master"
                                  placeholder="Nama Master">

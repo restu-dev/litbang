@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Session;
+use Illuminate\Support\Carbon;
+
 
 class ApprovalController extends Controller
 {
@@ -108,21 +110,45 @@ class ApprovalController extends Controller
 
     public function index()
     {
-        $title = 'Approval';
+        $hariIni = Carbon::now()->toDateString();
+
+        $tahunAjar = DB::table('master_tahun_pelajaran')
+        ->whereDate('awal', '<=', $hariIni)
+        ->whereDate('akhir', '>=', $hariIni)
+        ->first();
+
+        $id_tahun_ajaran = $tahunAjar ? $tahunAjar->id : null;
+        $nama_tahun_ajaran = $tahunAjar ? $tahunAjar->nama : null;
+
+        $title = 'Approval ' . $nama_tahun_ajaran;
         $active = 'approval';
 
         $no_pegawai = session('no_pegawai');
         // $no_pegawai = '20000497';
         $ada_struktur = $this->cekStrukturOrganisasi($no_pegawai);
-    
-        return view('approval.index', compact('title', 'active', 'ada_struktur'));
+
+        return view('approval.index', [
+            'title' => $title,
+            'active' => $active,
+            'tahunAjar' => $tahunAjar,
+            'id_tahun_ajaran' => $id_tahun_ajaran,
+            'nama_tahun_ajaran' => $nama_tahun_ajaran,
+            'ada_struktur' => $ada_struktur
+        ]);
     }
 
 
     public function loadTabelProgramKerjaTahunanApprov(Request $request)
     {
+        $id_tahun_ajaran = $request->id_tahun_ajaran;
         $filter_status_capaian = $request->filter_status_capaian;
         $filter_approvement = $request->filter_approvement;
+        $filter_tahun = $request->filter_tahun;
+
+        $Ftahun = '';
+        if (!empty($filter_tahun)) {
+            $Ftahun = "AND a.id_tahun_pelajaran='$filter_tahun'";
+        }
 
         $Fstatus = '';
         if (!empty($filter_status_capaian)) {
@@ -142,13 +168,17 @@ class ApprovalController extends Controller
 
         $data = DB::select("SELECT a.*,
                                 b.nama AS nama_status_pencapaian,
-                                c.nama_pegawai
+                                c.nama_pegawai,
+                                d.nama AS nama_tahun_pelajaran
                             FROM program_kerja_tahunan a
                             LEFT JOIN master_status_pencapaian b ON b.id=a.id_status_capaian
                             LEFT JOIN simpia.Data_Induk_Pegawai c ON c.no_pegawai=a.penanggung_jawab
+                            LEFT JOIN litbang.master_tahun_pelajaran d ON d.id=a.id_tahun_pelajaran
                             WHERE a.id <> ''
                             {$Fstatus}
                             {$Fapprove}
+                            {$Ftahun}
+                            AND d.id = '$id_tahun_ajaran'
                             AND penanggung_jawab IN ($list)
                             ORDER BY created_at ASC");
 

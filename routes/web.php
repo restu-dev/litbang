@@ -26,6 +26,7 @@ use App\Http\Controllers\MasterJenisKegiatanController;
 use App\Http\Controllers\ProgramKerjaTahunanController;
 use App\Http\Controllers\MasterTahunPelajaranController;
 use App\Http\Controllers\MasterStatusPencapaianController;
+use App\Http\Controllers\ReportProgramKerjaTahunanController;
 
 
 
@@ -63,6 +64,8 @@ Route::post('load-tabel-program-kerja-tahunan', [ProgramKerjaTahunanController::
 Route::post('simpan-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'simpanProgramKerjaTahunan']);
 Route::post('get-data-edit-program-kerja-tahunan-by-id', [ProgramKerjaTahunanController::class, 'getDataEditProgramKerjaTahunanById']);
 Route::post('destroy-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'destroy']);
+Route::post('clone-program-kerja', [ProgramKerjaTahunanController::class, 'cloneDariTahunLalu']);
+
 
 // approval
 Route::get('/coba', [ApprovalController::class, 'coba'])->middleware('auth');
@@ -76,6 +79,17 @@ Route::post('load-tabel-jurnal-harian', [JurnalHarianController::class, 'loadTab
 Route::post('simpan-jurnal-harian', [JurnalHarianController::class, 'simpanJurnalHarian']);
 Route::post('get-data-edit-jurnal-harian-by-id', [JurnalHarianController::class, 'getDataEditJurnalHarianById']);
 Route::post('destroy-jurnal-harian', [JurnalHarianController::class, 'destroy']);
+
+
+// == reporting
+
+// report-program-tahunan
+Route::get('/report-program-tahunan', [ReportProgramKerjaTahunanController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-report-program-tahunan', [ReportProgramKerjaTahunanController::class, 'loadTabelReportProgramKerjaTahunan'])->name('load-tabel-report-program-tahunan');
+
+// report-jurnal-harian
+Route::get('/report-jurnal-harian', [ReportProgramKerjaTahunanController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-report-jurnal-harian', [ReportProgramKerjaTahunanController::class, 'loadTabelReportProgramKerjaTahunan'])->name('load-tabel-report-jurnal-harian');
 
 
 // == master 
@@ -142,6 +156,7 @@ Route::post('load-table-detail-data-user', [ReportJumlahUserController::class, '
 Route::post('load-table-detail-data-asset', [ReportJumlahUserController::class, 'loadTableDetailDataAsset'])->name('load-table-detail-data-asset')->middleware('auth');
 
 // select
+Route::post('select-tahun-pelajaran', [SelectController::class, 'getTahunPelajaran'])->name('select-tahun-pelajaran')->middleware('auth');
 Route::post('select-bidang', [SelectController::class, 'getBidang'])->name('select-bidang')->middleware('auth');
 Route::post('select-jenis-kegiatan', [SelectController::class, 'getJenisKegiatan'])->name('select-jenis-kegiatan')->middleware('auth');
 Route::post('select-status-capaian', [SelectController::class, 'getStatusCapaian'])->name('select-status-capaian')->middleware('auth');

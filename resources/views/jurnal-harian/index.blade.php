@@ -6,198 +6,209 @@
  @endsection
 
  @section('content')
-     @if (session('id_bidang') == '')
-         <div class="alert alert-danger alert-dismissible">
-             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-             <h5><i class="icon fas fa-ban"></i> Peringatan !</h5>
-             Bidang user belum disetting Admin, hubungi admin terlebih dahulu untuk setting bidang!
+     @if ($tahunAjar)
+         @if (session('id_bidang') == '')
+             <div class="alert alert-danger alert-dismissible">
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                 <h5><i class="icon fas fa-ban"></i> Peringatan !</h5>
+                 Bidang user belum disetting Admin, hubungi admin terlebih dahulu untuk setting bidang!
+             </div>
+         @else
+             {{-- filter --}}
+             <div class="row">
+                 <div class="col-lg-12">
+                     <div class="card">
+                         <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+
+                         <div class="card-body card-body">
+                             <div class="row justify-content-start">
+                                 {{-- filter_jenis_kegiatan --}}
+                                 <div class="col-3">
+                                     <select id="filter_jenis_kegiatan" class="form-control select2" style="width: 100%;">
+                                     </select>
+                                 </div>
+
+                                 {{-- filter_program_kerja --}}
+                                 <div class="col-3">
+                                     <select id="filter_program_kerja" class="form-control select2" style="width: 100%;">
+                                     </select>
+                                 </div>
+
+                                 {{-- filter approvement --}}
+                                 <div class="col-3">
+                                     <select id="filter_status_pencapaian" class="form-control select2"
+                                         style="width: 100%;">
+                                     </select>
+                                 </div>
+
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <div class="row">
+                 <div class="col-lg-12">
+                     <div class="card">
+                         <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+
+                         <div class="card-header">
+
+                             <div class="btn-group">
+                                 <button type="button" title="Add" data-btn="add"
+                                     class="add_edit_data btn btn-success"><i class="fa fa-add"></i> Add Data</button>
+                             </div>
+                         </div>
+
+                         <div class="card-body">
+                             <table id="tabel_master" class="table table-bordered table-striped table-sm">
+                                 <thead>
+                                     <tr>
+                                         <th>No</th>
+                                         <th>Aksi</th>
+                                         <th>Bidang</th>
+                                         <th>Uraian Kegiatan</th>
+                                         <th>Jenis Kegiatan</th>
+                                         <th>Output Dokumen</th>
+                                         <th>Dokumen</th>
+                                         <th>Foto</th>
+                                         <th>Program Kerja</th>
+                                         <th>Tgl Mulai</th>
+                                         <th>Tgl Selesai</th>
+                                         <th>Status Pencapaian</th>
+                                         <th>Keterangan</th>
+                                     </tr>
+                                 </thead>
+                             </table>
+                         </div>
+
+                     </div>
+                 </div>
+             </div>
+         @endif
+
+         {{-- modal add edit --}}
+         <div class="modal fade" id="modal_add_edit">
+             <div class="modal-dialog">
+                 <div class="modal-content">
+
+                     <div class="modal-header">
+                         <h4 class="modal-title">Default Modal</h4>
+                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                             <span aria-hidden="true">&times;</span>
+                         </button>
+                     </div>
+
+                     <div class="modal-body">
+                         <form id="jurnalForm" enctype="multipart/form-data">
+                             @csrf
+
+                             <input type="hidden" name="id" id="id">
+                             <input type="hidden" value="{{ $id_tahun_ajaran }}" name="id_tahun_ajaran" id="id_tahun_ajaran">
+
+                             {{-- uraian_kegiatan --}}
+                             <div class="form-group">
+                                 <label for="uraian_kegiatan">Uraian Kegiatan <code>*</code></label>
+                                 <input type="text" name="uraian_kegiatan" class="form-control" id="uraian_kegiatan"
+                                     placeholder="Input Uraian Kegiatan">
+                             </div>
+
+                             {{-- id_jenis_kegiatan --}}
+                             <div class="form-group">
+                                 <label for="id_jenis_kegiatan">Jenis Kegiatan <code>*</code></label>
+
+                                 <select id="id_jenis_kegiatan" name="id_jenis_kegiatan" class="form-control select2"
+                                     style="width: 100%;">
+                                 </select>
+                             </div>
+
+                             {{-- output_dokumen --}}
+                             <div class="form-group">
+                                 <label for="output_dokumen">Output Dokumen <code>*</code></label>
+                                 <input type="text" name="output_dokumen" class="form-control" id="output_dokumen"
+                                     placeholder="Input Output Dokumen">
+                             </div>
+
+                             {{-- id_program_kerja_tahunan --}}
+                             <div class="form-group">
+                                 <label for="id_program_kerja_tahunan">Program Kerja </label>
+
+                                 <select id="id_program_kerja_tahunan" name="id_program_kerja_tahunan"
+                                     class="form-control select2" style="width: 100%;">
+                                 </select>
+                             </div>
+
+                             {{-- tanggal_mulai --}}
+                             <div class="form-group">
+                                 <label for="tanggal_mulai">Tanggal Mulai <code>*</code></label>
+                                 <input type="date" name="tanggal_mulai" class="form-control" id="tanggal_mulai"
+                                     placeholder="Input Tanggal Mulai">
+                             </div>
+
+                             {{-- tanggal_selesai --}}
+                             <div class="form-group">
+                                 <label for="tanggal_selesai">Tanggal Selesai <code>*</code></label>
+                                 <input type="date" name="tanggal_selesai" class="form-control" id="tanggal_selesai"
+                                     placeholder="Input Tanggal Selesai">
+                             </div>
+
+                             {{-- id_status_pencapaian --}}
+                             <div class="form-group">
+                                 <label for="id_status_pencapaian">Status Capaian <code>*</code></label>
+
+                                 <select id="id_status_pencapaian" name="id_status_pencapaian"
+                                     class="form-control select2" style="width: 100%;">
+                                 </select>
+                             </div>
+
+                             {{-- file_dokumen --}}
+                             <div class="form-group">
+                                 <label for="file_dokumen">File Dokumen (PDF)</label>
+                                 <input type="file" name="file_dokumen" accept=".pdf" class="form-control"
+                                     id="file_dokumen" placeholder="Input File Dokumen (PDF)">
+                             </div>
+
+                             {{-- file_foto --}}
+                             <div class="form-group">
+                                 <label for="file_foto">File Foto (Gambar)</label>
+                                 <input type="file" name="file_foto" accept="image/*" class="form-control"
+                                     id="file_foto" placeholder="Input Foto (Gambar)">
+                             </div>
+
+                             {{-- Keterangan --}}
+                             <div class="form-group">
+                                 <label for="keterangan">Keterangan </label>
+                                 <textarea name="keterangan" id="keterangan" class="form-control" placeholder="Input Keterangan"></textarea>
+                             </div>
+
+                     </div>
+
+                     <div class="modal-footer justify-content-between">
+                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                         <button type="submit" id="save_form" class="btn btn-primary">Simpan</button>
+                     </div>
+
+                     </form>
+                 </div>
+             </div>
          </div>
      @else
-         {{-- filter --}}
-         <div class="row">
-             <div class="col-lg-12">
-                 <div class="card">
-                     <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
-
-                     <div class="card-body card-body">
-                         <div class="row justify-content-start">
-                             {{-- filter_jenis_kegiatan --}}
-                             <div class="col-3">
-                                 <select id="filter_jenis_kegiatan" class="form-control select2" style="width: 100%;">
-                                 </select>
-                             </div>
-
-                             {{-- filter_program_kerja --}}
-                             <div class="col-3">
-                                 <select id="filter_program_kerja" class="form-control select2" style="width: 100%;">
-                                 </select>
-                             </div>
-
-                             {{-- filter approvement --}}
-                             <div class="col-3">
-                                 <select id="filter_status_pencapaian" class="form-control select2" style="width: 100%;">
-                                 </select>
-                             </div>
-
-                         </div>
-                     </div>
-                 </div>
-             </div>
-         </div>
-
-         <div class="row">
-             <div class="col-lg-12">
-                 <div class="card">
-                     <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
-
-                     <div class="card-header">
-
-                         <div class="btn-group">
-                             <button type="button" title="Add" data-btn="add" class="add_edit_data btn btn-success"><i
-                                     class="fa fa-add"></i> Add Data</button>
-                         </div>
-                     </div>
-
-                     <div class="card-body">
-                         <table id="tabel_master" class="table table-bordered table-striped table-sm">
-                             <thead>
-                                 <tr>
-                                     <th>No</th>
-                                     <th>Aksi</th>
-                                     <th>Bidang</th>
-                                     <th>Uraian Kegiatan</th>
-                                     <th>Jenis Kegiatan</th>
-                                     <th>Output Dokumen</th>
-                                     <th>Dokumen</th>
-                                     <th>Foto</th>
-                                     <th>Program Kerja</th>
-                                     <th>Tgl Mulai</th>
-                                     <th>Tgl Selesai</th>
-                                     <th>Status Pencapaian</th>
-                                     <th>Keterangan</th>
-                                 </tr>
-                             </thead>
-                         </table>
-                     </div>
-
-                 </div>
-             </div>
+         <div class="alert alert-danger">
+             Saat ini <strong>tidak berada</strong> dalam rentang tahun ajaran manapun.
          </div>
      @endif
+ @endsection
 
-
-
-     {{-- modal add edit --}}
-     <div class="modal fade" id="modal_add_edit">
-         <div class="modal-dialog">
-             <div class="modal-content">
-
-                 <div class="modal-header">
-                     <h4 class="modal-title">Default Modal</h4>
-                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                         <span aria-hidden="true">&times;</span>
-                     </button>
-                 </div>
-
-                 <div class="modal-body">
-                     <form id="jurnalForm" enctype="multipart/form-data">
-                         @csrf
-
-                         <input type="hidden" name="id" id="id">
-
-                         {{-- uraian_kegiatan --}}
-                         <div class="form-group">
-                             <label for="uraian_kegiatan">Uraian Kegiatan</label>
-                             <input type="text" name="uraian_kegiatan" class="form-control" id="uraian_kegiatan"
-                                 placeholder="Input Uraian Kegiatan">
-                         </div>
-
-                         {{-- id_jenis_kegiatan --}}
-                         <div class="form-group">
-                             <label for="id_jenis_kegiatan">Jenis Kegiatan</label>
-
-                             <select id="id_jenis_kegiatan" name="id_jenis_kegiatan" class="form-control select2"
-                                 style="width: 100%;">
-                             </select>
-                         </div>
-
-                         {{-- output_dokumen --}}
-                         <div class="form-group">
-                             <label for="output_dokumen">Output Dokumen</label>
-                             <input type="text" name="output_dokumen" class="form-control" id="output_dokumen"
-                                 placeholder="Input Output Dokumen">
-                         </div>
-
-                         {{-- id_program_kerja_tahunan --}}
-                         <div class="form-group">
-                             <label for="id_program_kerja_tahunan">Program Kerja</label>
-
-                             <select id="id_program_kerja_tahunan" name="id_program_kerja_tahunan"
-                                 class="form-control select2" style="width: 100%;">
-                             </select>
-                         </div>
-
-                         {{-- tanggal_mulai --}}
-                         <div class="form-group">
-                             <label for="tanggal_mulai">Tanggal Mulai</label>
-                             <input type="date" name="tanggal_mulai" class="form-control" id="tanggal_mulai"
-                                 placeholder="Input Tanggal Mulai">
-                         </div>
-
-                         {{-- tanggal_selesai --}}
-                         <div class="form-group">
-                             <label for="tanggal_selesai">Tanggal Selesai</label>
-                             <input type="date" name="tanggal_selesai" class="form-control" id="tanggal_selesai"
-                                 placeholder="Input Tanggal Selesai">
-                         </div>
-
-                         {{-- id_status_pencapaian --}}
-                         <div class="form-group">
-                             <label for="id_status_pencapaian">Status Capaian</label>
-
-                             <select id="id_status_pencapaian" name="id_status_pencapaian" class="form-control select2"
-                                 style="width: 100%;">
-                             </select>
-                         </div>
-
-                         {{-- file_dokumen --}}
-                         <div class="form-group">
-                             <label for="file_dokumen">File Dokumen (PDF)</label>
-                             <input type="file" name="file_dokumen" accept=".pdf" class="form-control"
-                                 id="file_dokumen" placeholder="Input File Dokumen (PDF)">
-                         </div>
-
-                         {{-- file_foto --}}
-                         <div class="form-group">
-                             <label for="file_foto">File Foto (Gambar)</label>
-                             <input type="file" name="file_foto" accept="image/*" class="form-control"
-                                 id="file_foto" placeholder="Input Foto (Gambar)">
-                         </div>
-
-                         {{-- Keterangan --}}
-                         <div class="form-group">
-                             <label for="keterangan">Keterangan</label>
-                             <textarea name="keterangan" id="keterangan" class="form-control" placeholder="Input Keterangan"></textarea>
-                         </div>
-
-                 </div>
-
-                 <div class="modal-footer justify-content-between">
-                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                     <button type="submit" id="save_form" class="btn btn-primary">Simpan</button>
-                 </div>
-
-                 </form>
-             </div>
-         </div>
-     @endsection
-
+ @if ($tahunAjar)
      @section('script')
          <script src="/datatable/dataTables.responsive.min.js"></script>
          <script src="/datatable/dataTables.fixedColumns.min.js"></script>
 
          <script>
              $(function() {
+                 var id_tahun_ajaran = {{ $id_tahun_ajaran }};
+                 var id_nama_tahun_ajarantahun_ajaran = {{ $nama_tahun_ajaran }};
+
                  loadFilterJenisKegiatan();
                  loadFilterProgramKerja();
                  loadFilterStatusPencapaian();
@@ -228,7 +239,8 @@
                      $('#filter_program_kerja').empty()
 
                      $.post('{{ URL::to('select-program-kerja-by-user') }}', {
-                         _token: '{{ csrf_token() }}'
+                         _token: '{{ csrf_token() }}',
+                         id_tahun_ajaran
                      }, function(e) {
 
                          $("#filter_program_kerja").select2({
@@ -285,7 +297,6 @@
                      loadTabelData(filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian);
                  });
 
-                
                  // on change filter_status_pencapaian
                  $('#filter_status_pencapaian').on("change", function(e) {
 
@@ -299,7 +310,7 @@
                  loadSelectJenisKegiatan();
                  loadSelectStatusCapaian();
                  loadSelectProgramKerja();
-                 loadTabelData('', '' , '');
+                 loadTabelData('', '', '');
 
                  function loadSelectJenisKegiatan() {
                      $('.loader').show()
@@ -342,7 +353,8 @@
                      $('#id_program_kerja_tahunan').empty()
 
                      $.post('{{ URL::to('select-program-kerja-by-user') }}', {
-                         _token: '{{ csrf_token() }}'
+                         _token: '{{ csrf_token() }}',
+                         id_tahun_ajaran
                      }, function(e) {
 
                          $("#id_program_kerja_tahunan").select2({
@@ -365,6 +377,7 @@
                          filter_jenis_kegiatan,
                          filter_program_kerja,
                          filter_status_pencapaian,
+                         id_tahun_ajaran,
                          _token: '{{ csrf_token() }}'
                      }, function(e) {
                          var tabel = $("#tabel_master").DataTable({
@@ -520,8 +533,6 @@
                          tampilPesan('warning', ' Jenis Kegiatan tidak boleh kosong!');
                      } else if (output_dokumen == "") {
                          tampilPesan('warning', ' Output Dokumen tidak boleh kosong!');
-                     } else if (id_program_kerja_tahunan == null) {
-                         tampilPesan('warning', ' Program Kerja Tahunan tidak boleh kosong!');
                      } else if (tanggal_mulai == "") {
                          tampilPesan('warning', ' Tanggal Mulai tidak boleh kosong!');
                      } else if (tanggal_selesai == "") {
@@ -542,11 +553,13 @@
                                  var pesan = result.pesan;
 
                                  if (sukses == "Y") {
-                                    var filter_jenis_kegiatan = $("#filter_jenis_kegiatan").val();
-                                    var filter_program_kerja = $("#filter_program_kerja").val();
-                                    var filter_status_pencapaian = $("#filter_status_pencapaian").val();
+                                     var filter_jenis_kegiatan = $("#filter_jenis_kegiatan").val();
+                                     var filter_program_kerja = $("#filter_program_kerja").val();
+                                     var filter_status_pencapaian = $("#filter_status_pencapaian")
+                                         .val();
 
-                                    loadTabelData(filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian);
+                                     loadTabelData(filter_jenis_kegiatan, filter_program_kerja,
+                                         filter_status_pencapaian);
 
                                      $('.loader').hide();
                                      tampilPesan('success', result.pesan);
@@ -595,11 +608,15 @@
                                      _token: '{{ csrf_token() }}'
                                  },
                                  success: function(result) {
-                                     var filter_jenis_kegiatan = $("#filter_jenis_kegiatan").val();
-                                    var filter_program_kerja = $("#filter_program_kerja").val();
-                                    var filter_status_pencapaian = $("#filter_status_pencapaian").val();
+                                     var filter_jenis_kegiatan = $("#filter_jenis_kegiatan")
+                                         .val();
+                                     var filter_program_kerja = $("#filter_program_kerja")
+                                         .val();
+                                     var filter_status_pencapaian = $(
+                                         "#filter_status_pencapaian").val();
 
-                                    loadTabelData(filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian);
+                                     loadTabelData(filter_jenis_kegiatan,
+                                         filter_program_kerja, filter_status_pencapaian);
 
                                      $('.loader').hide();
 
@@ -624,3 +641,4 @@
              });
          </script>
      @endsection
+ @endif
