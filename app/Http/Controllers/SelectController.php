@@ -75,6 +75,14 @@ class SelectController extends Controller
         return $values;
     }
 
+    public function getLevel()
+    {
+        $values = \DB::select("SELECT id as id, name as text 
+                               FROM litbang.level 
+                               ORDER BY name ASC");
+        return $values;
+    }
+
     public function getBidang()
     {
         $values = \DB::select("SELECT id as id, nama as text 

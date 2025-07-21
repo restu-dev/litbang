@@ -193,6 +193,7 @@ class LoginController extends Controller
 
                 $jam = now();
                 UserLevel::where('nip', $request->user)->update(['last_login' => $jam]);
+                
                 return redirect()->intended('data-dashboard');
             }
         }

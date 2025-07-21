@@ -205,7 +205,8 @@ class UserController extends Controller
             // insert
             UserLevel::insert([
                 'nip' => $idpegawai,
-                'id_level' => $idlevel
+                'id_level' => $idlevel,
+                'yt_civitas' => 'Y'
             ]);
         } else {
             if (empty($idlevel)) {

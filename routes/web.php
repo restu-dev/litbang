@@ -21,6 +21,7 @@ use App\Http\Controllers\KeteranganController;
 use App\Http\Controllers\JurnalHarianController;
 use App\Http\Controllers\MasterBidangController;
 use App\Http\Controllers\ReportDataUserController;
+use App\Http\Controllers\UserNonCivitasController;
 use App\Http\Controllers\ReportKehadiranController;
 use App\Http\Controllers\ReportJumlahUserController;
 use App\Http\Controllers\ReportJurnalHarianController;
@@ -106,7 +107,6 @@ Route::post('load-tabel-master-tahun-pelajaran', [MasterTahunPelajaranController
 Route::post('store-master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'store']);
 Route::post('destroy-master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'destroy']);
 
-
 // master_bidang
 Route::get('/master-bidang', [MasterBidangController::class, 'index'])->middleware('auth');
 Route::post('load-tabel-master-bidang', [MasterBidangController::class, 'loadTabelMasterBidang'])->name('load-tabel-master-bidang');
@@ -124,7 +124,6 @@ Route::get('/master-status-pencapaian', [MasterStatusPencapaianController::class
 Route::post('load-tabel-master-status-pencapaian', [MasterStatusPencapaianController::class, 'loadTabelMasterStatusPencapaian'])->name('load-tabel-master-status-pencapaian');
 Route::post('store-master-status-pencapaian', [MasterStatusPencapaianController::class, 'store']);
 Route::post('destroy-master-status-pencapaian', [MasterStatusPencapaianController::class, 'destroy']);
-
 
 // master keterangan
 Route::get('/keterangan', [KeteranganController::class, 'index'])->name('keterangan')->middleware('auth');
@@ -163,6 +162,7 @@ Route::post('load-table-detail-data-asset', [ReportJumlahUserController::class, 
 
 // select
 Route::post('select-tahun-pelajaran', [SelectController::class, 'getTahunPelajaran'])->name('select-tahun-pelajaran')->middleware('auth');
+Route::post('select-level', [SelectController::class, 'getLevel'])->name('select-level')->middleware('auth');
 Route::post('select-bidang', [SelectController::class, 'getBidang'])->name('select-bidang')->middleware('auth');
 Route::post('select-jenis-kegiatan', [SelectController::class, 'getJenisKegiatan'])->name('select-jenis-kegiatan')->middleware('auth');
 Route::post('select-status-capaian', [SelectController::class, 'getStatusCapaian'])->name('select-status-capaian')->middleware('auth');
@@ -171,7 +171,6 @@ Route::post('select-data-pegawai-by-so', [SelectController::class, 'dataPegawaiB
 
 Route::post('/select-nama-pegawai', [SelectController::class, 'namaPegawai'])->name('nama-pegawai')->middleware('auth');
 Route::post('/select-nama-asset', [SelectController::class, 'namaAsset'])->name('select-nama-asset')->middleware('auth');
-
 
 
 // login
@@ -196,6 +195,12 @@ Route::post('admin/load-tabel-user', [UserController::class, 'loadTabelUser'])->
 Route::post('admin/hapus-akses', [UserController::class, 'hapusAkses']);
 Route::post('admin/simpan-level-user', [UserController::class, 'simpanLevelUser']);
 Route::post('admin/simpan-bidang-user', [UserController::class, 'simpanBidangUser']);
+
+// user-non-civitas
+Route::get('/user-non-civitas', [UserNonCivitasController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-user-non-civitas', [UserNonCivitasController::class, 'loadTabelUserNonCivitas'])->name('load-tabel-user-non-civitas');
+Route::post('store-user-non-civitas', [UserNonCivitasController::class, 'store']);
+Route::post('destroy-user-non-civitas', [UserNonCivitasController::class, 'destroy']);
 
 // menu header
 Route::get('/admin/menu', [MenuController::class, 'index'])->middleware('auth');
