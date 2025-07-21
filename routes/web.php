@@ -21,6 +21,7 @@ use App\Http\Controllers\KeteranganController;
 use App\Http\Controllers\JurnalHarianController;
 use App\Http\Controllers\MasterBidangController;
 use App\Http\Controllers\ReportDataUserController;
+use App\Http\Controllers\ReportKehadiranController;
 use App\Http\Controllers\ReportJumlahUserController;
 use App\Http\Controllers\ReportJurnalHarianController;
 use App\Http\Controllers\MasterJenisKegiatanController;
@@ -92,6 +93,10 @@ Route::post('load-tabel-report-program-tahunan', [ReportProgramKerjaTahunanContr
 Route::get('/report-jurnal-harian', [ReportJurnalHarianController::class, 'index'])->middleware('auth');
 Route::post('load-tabel-report-jurnal-harian', [ReportJurnalHarianController::class, 'loadTabelReportJurnalHarian'])->name('load-tabel-report-jurnal-harian');
 
+// report-kehadiaran
+Route::get('/report-kehadiaran', [ReportKehadiranController::class, 'index'])->middleware('auth');
+Route::post('load-tabel-report-kehadiaran', [ReportKehadiranController::class, 'loadTabelReportKehadiran'])->name('load-tabel-report-kehadiaran');
+
 
 // == master 
 
@@ -162,6 +167,7 @@ Route::post('select-bidang', [SelectController::class, 'getBidang'])->name('sele
 Route::post('select-jenis-kegiatan', [SelectController::class, 'getJenisKegiatan'])->name('select-jenis-kegiatan')->middleware('auth');
 Route::post('select-status-capaian', [SelectController::class, 'getStatusCapaian'])->name('select-status-capaian')->middleware('auth');
 Route::post('select-program-kerja-by-user', [SelectController::class, 'getProgramKerjaByUser'])->name('select-program-kerja-by-user')->middleware('auth');
+Route::post('select-data-pegawai-by-so', [SelectController::class, 'dataPegawaiBySo'])->name('select-data-pegawai-by-so')->middleware('auth');
 
 Route::post('/select-nama-pegawai', [SelectController::class, 'namaPegawai'])->name('nama-pegawai')->middleware('auth');
 Route::post('/select-nama-asset', [SelectController::class, 'namaAsset'])->name('select-nama-asset')->middleware('auth');

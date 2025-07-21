@@ -1,3 +1,33 @@
+Fri, 18 Jul 2025 14:59:49 +0700 restu: 
+add report jurnal harian 
+
+ 4 files changed, 532 insertions(+), 3 deletions(-)
+
+Fri, 18 Jul 2025 13:59:24 +0700 restu: 
+report program kerja tahunan 
+
+ 13 files changed, 1754 insertions(+), 925 deletions(-)
+
+Thu, 17 Jul 2025 14:13:19 +0700 restu: 
+add rubah password & master tahun pelajaran 
+
+ 7 files changed, 639 insertions(+), 4 deletions(-)
+
+Thu, 17 Jul 2025 08:57:18 +0700 restu: 
+Fitur approvel program kerja tahunan 
+
+ 15 files changed, 916 insertions(+), 53 deletions(-)
+
+Tue, 15 Jul 2025 13:36:54 +0700 restu: 
+add jurnal harian 
+
+ 12 files changed, 1584 insertions(+), 24 deletions(-)
+
+Sat, 12 Jul 2025 08:30:38 +0700 restu: 
+add master bidang, add master jenis kegiatan, add master status pencapaian 
+
+ 26 files changed, 1009 insertions(+), 140 deletions(-)
+
 Mon, 2 Jun 2025 07:54:56 +0700 restu: 
 update redme 
 

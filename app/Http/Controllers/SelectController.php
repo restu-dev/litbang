@@ -113,6 +113,41 @@ class SelectController extends Controller
         return $values;
     }
 
+    function childId($_parentId)
+    {
+        $results = \DB::select('SELECT id_struktur id,nama_struktur text,set_struktur _parentId,\'\' as children,
+					\'icon-man\' as iconCls,kode_lembaga,kode_unit,kode_jenjang,kode_jabatan,\'\' status FROM simpia.Struktur_Organisasi
+				where set_struktur=?', [$_parentId]);
+        $id = $_parentId;
+        for ($i = 0; $i < count($results); $i++) {
+            $id = $id . "," . $this->childId($results[$i]->id);
+        }
+        return $id;
+    }
+
+    public function dataPegawaiBySo(Request $request)
+    {
+        $id_struktur = session('id_struktur');
+
+        $in_ = $this->childId($id_struktur);
+
+        if ($id_struktur == '')
+        $data = DB::select('SELECT d.no_pegawai as id, concat(d.NIP,\' - \',d.nama_pegawai) text FROM simpia.Data_Induk_Pegawai d,simpia.Penempatan_Kerja_Pegawai p 
+			  WHERE p.no_pegawai=d.no_pegawai
+			  AND (resign =\'\' or resign is null)
+			  AND p.tanggal_penempatan=(select max(aa.tanggal_penempatan) FROM simpia.Penempatan_Kerja_Pegawai aa
+								WHERE p.no_pegawai=aa.no_pegawai order by d.nama_pegawai)');
+        else
+        $data = DB::select('SELECT d.no_pegawai as id, concat(d.NIP,\' - \',d.nama_pegawai) text FROM simpia.Data_Induk_Pegawai d,simpia.Penempatan_Kerja_Pegawai p 
+			  WHERE p.no_pegawai=d.no_pegawai
+			  AND (resign =\'\' or resign is null)
+			  AND id_struktur in (' . $in_ . ')
+			  AND p.tanggal_penempatan=(select max(aa.tanggal_penempatan) FROM simpia.Penempatan_Kerja_Pegawai aa
+								WHERE p.no_pegawai=aa.no_pegawai order by d.nama_pegawai)');
+        
+        return $data;
+    }
+
 
   
 
