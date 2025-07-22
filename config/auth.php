@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\UserLevel;
+
 return [
 
     /*
@@ -40,6 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'userlevels',
+        ],
     ],
 
     /*
@@ -63,6 +70,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+
+        'userlevels' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\UserLevel::class,
         ],
 
         // 'users' => [

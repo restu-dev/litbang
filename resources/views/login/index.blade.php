@@ -174,12 +174,13 @@
             @endif
 
             @csrf
+
             <div class="form-floating">
                 <input style="margin-bottom: -1px; border-bottom-right-radius: 0; border-bottom-left-radius: 0;"
                     value="{{ old('user') }}" required type="text" name="user"
                     class="form-control rounded-top @error('user') is-invalid @enderror" id="user"
                     placeholder="user">
-                <label for="name">NIP</label>
+                <label for="name">NIP / User</label>
                 @error('user')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -199,7 +200,23 @@
                 @enderror
             </div>
 
-            <div class="form-floating">
+            <div class="form-group clearfix p-2">
+                <div class="icheck-primary d-inline p-1">
+                    <input type="radio" id="radioPrimary1" value="Y" name="yt_civitas" checked="">
+                    <label for="radioPrimary1">
+                        Civitas
+                    </label>
+                </div>
+
+                <div class="icheck-primary d-inline p-1">
+                    <input type="radio" id="radioPrimary2" value="T" name="yt_civitas">
+                    <label for="radioPrimary2">
+                        Non Civitas
+                    </label>
+                </div>
+            </div>
+
+            {{-- <div class="form-floating">
 
                 <div class="g-recaptcha @error('g-recaptcha-response') is-invalid @enderror"
                     style="transform: scale(0.77); -webkit-transform: scale(0.77); transform-origin: 0 0; -webkit-transform-origin: 0 0;"
@@ -211,11 +228,40 @@
                     </span>
                 @enderror
 
-            </div>
+            </div> --}}
+
+                <div class="row mb-3">
+
+                        <div class="input-group mb-3">
+                            <div class="col-5">
+                                <span class="capchaa pr-2">{!! captcha_img() !!}</span>
+                            </div>
+
+                            <div class="col-2">
+                                <button type="button" class="btn btn-danger" class="reload" id="reload">
+                                    &#x21bb;
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <div class="col-12">
+                            <input id="captcha" type="text"
+                                class="form-control @error('captcha') is-invalid @enderror" placeholder="Input Captcha"
+                                name="captcha">
+
+                            @error('captcha')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
 
             <button class="btn btn-primary w-100 py-2" type="submit">Login</button>
 
-            <p class="text-center mt-3 mb-3 text-body-secondary">Login mengunakan user & password ESA <br>~ Pesantren Islam Al-Irsyad ~</p>
+            <p class="text-center mt-3 mb-3 text-body-secondary">Login mengunakan user & password ESA <br>~ Pesantren
+                Islam Al-Irsyad ~</p>
         </form>
     </main>
 
@@ -224,6 +270,18 @@
     <script src="/captcha/jquery.min.js"></script>
 
     <script src="login_template/js/bootstrap.bundle.min.js"></script>
+
+        <script type="text/javascript">
+        $(document).on("click", "#reload", function(e) {
+            $.ajax({
+                type: 'GET',
+                url: 'reload-captcha',
+                success: function(data) {
+                    $(".capchaa").html(data.captcha);
+                }
+            });
+        });
+    </script>
 
 </body>
 

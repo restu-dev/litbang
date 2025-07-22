@@ -7,6 +7,7 @@ use App\Models\UserLevel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserNonCivitasController extends Controller
 {
@@ -54,10 +55,27 @@ class UserNonCivitasController extends Controller
             'id_level' => $request->level,
             'yt_civitas' => 'T'
         ];
-        
+
         if($request->id==NULL){
             // insert
             $data['created_at'] = date('Y-m-d H:i:s');
+
+            // cek unik nip
+            $cek = UserLevel::where('nip', $request->nama_user)->count();
+
+            // jika nip sudah dipake gagal
+            if ($cek > 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Gagal, user " . $request->nama_user . " sudah terpake!",
+                ]);
+            }
+
+            $pass = $request->pass_user;
+
+            $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
+
+            $data['pass_user'] = $hashed_pass;
 
             UserLevel::insert($data);
         }else{
@@ -69,7 +87,7 @@ class UserNonCivitasController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => "Insert!",
+            'message' => "Berhasil simpan data!",
         ]);
     }
 

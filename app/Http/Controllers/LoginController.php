@@ -4,14 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Level;
-use App\Models\MasterBidang;
 use App\Models\UserLevel;
+use App\Models\MasterBidang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
 class LoginController extends Controller
 {
+    public function reloadCaptcha()
+    {
+        return response()->json(['captcha' => captcha_img()]);
+    }
+
     public function index()
     {
         if (Auth::check()) {
@@ -25,14 +31,15 @@ class LoginController extends Controller
     {
         $user = $credentials['user'];
         $password = $credentials['password'];
-        $recaptcha = $credentials['g-recaptcha-response'];
+        $yt_civitas = $credentials['yt_civitas'];
+        $recaptcha = $credentials['captcha'];
 
         $lanjut = true;
         $sukses = "Y";
         $pesan  = "Berhasil";
         $user_final  = "";
 
-        $checks = \DB::select("SELECT p.no_pegawai AS id_pegawai,
+        $checks = DB::select("SELECT p.no_pegawai AS id_pegawai,
                                 p.NIP,
                                 nama_pegawai,
                                 ur.user,
@@ -56,6 +63,7 @@ class LoginController extends Controller
                                 WHERE tanggal_penempatan LIKE (SELECT MAX(tanggal_penempatan) FROM simpia.Penempatan_Kerja_Pegawai WHERE no_pegawai=p.no_pegawai)
                                 AND p.NIP='$user'
                                 AND ul.id_level <> ''
+                                AND ul.yt_civitas = 'Y'
                                 GROUP BY id_pegawai");
 
 
@@ -142,16 +150,110 @@ class LoginController extends Controller
         );
     }
 
+    public function checkloginnoncivitas($credentials)
+    {
+        $user = $credentials['user'];
+        $password = $credentials['password'];
+        $yt_civitas = $credentials['yt_civitas'];
+        $recaptcha = $credentials['captcha'];
+
+        $lanjut = true;
+        $sukses = "Y";
+        $pesan  = "Berhasil";
+        $user_final  = "";
+
+        $checks = DB::select("SELECT a.*,
+                                b.name AS nama_level 
+                            FROM user_level a
+                            LEFT JOIN level b ON b.id=a.id_level
+                            WHERE a.yt_civitas='T'
+                            AND nip='$user'");
+
+
+        //cek ada tidak user
+        foreach ($checks as $ck) {
+            $db_user = $ck->nip;
+            $db_pass = $ck->pass_user;
+            $level = $ck->id_level;
+            $kode_unit = "";
+            $kode_jenjang = "";
+            $nama_pegawai = $ck->nip;
+            $nama_jenjang = "";
+            $nama_unit = "";
+            $no_pegawai = $ck->nip;
+            $nip = $ck->nip;
+            $id_struktur = "";
+        }
+
+        if ($lanjut) {
+            if (empty($db_user)) {
+                $lanjut = false;
+                $sukses = "T";
+                $pesan  = "User $user Tidak di Temukan / tidak memiliki akses!";
+            }
+        }
+
+        if ($lanjut) {
+            if ($level == "") {
+                $lanjut = false;
+                $sukses = "T";
+                $pesan  = "User tidak diberi aksek untuk aplikasi ini..";
+            }
+        }
+
+        if ($lanjut) {
+            if (!password_verify($password, $db_pass)) {
+                $lanjut = false;
+                $sukses = "T";
+                $pesan  = "Password Tidak Sesuai";
+            }
+        }
+
+        $user_final = empty($db_user) ? '' : $db_user;
+        $level = empty($level) ? '' : $level;
+        $kode_unit = empty($kode_unit) ? '' : $kode_unit;
+        $kode_jenjang = empty($kode_jenjang) ? '' : $kode_jenjang;
+        $nama_pegawai = empty($nama_pegawai) ? '' : $nama_pegawai;
+        $nama_jenjang = empty($nama_jenjang) ? '' : $nama_jenjang;
+        $nama_unit = empty($nama_unit) ? '' : $nama_unit;
+        $no_pegawai = empty($no_pegawai) ? '' : $no_pegawai;
+        $nip = empty($nip) ? '' : $nip;
+        $id_struktur = empty($id_struktur) ? '' : $id_struktur;
+
+        return array(
+            "sukses" => $sukses,
+            "pesan" => $pesan,
+            "user_final" => $user_final,
+            "level" => $level,
+            "kode_unit" => $kode_unit,
+            "kode_jenjang" => $kode_jenjang,
+            "nama_pegawai" => $nama_pegawai,
+            "nama_jenjang" => $nama_jenjang,
+            "nama_unit" => $nama_unit,
+            "no_pegawai" => $no_pegawai,
+            "nip" => $nip,
+            "id_struktur" => $id_struktur
+        );
+    }
+
     public function authenticate(Request $request)
     {
 
         $credentials = $request->validate([
             'user' => 'required',
             'password' => 'required',
-            'g-recaptcha-response' => 'required'
+            'yt_civitas' => 'required',
+            'captcha' => 'required|captcha',
+            // 'g-recaptcha-response' => 'required'
         ]);
 
-        $checklogin = $this->checklogin($credentials);
+        $yt_civitas = $request->yt_civitas;
+
+        if($yt_civitas=="Y"){
+            $checklogin = $this->checklogin($credentials);
+        }else{
+            $checklogin = $this->checkloginnoncivitas($credentials);
+        }
 
         $sukses = $checklogin['sukses'];
         $pesan = $checklogin['pesan'];
@@ -167,38 +269,79 @@ class LoginController extends Controller
         $id_struktur = $checklogin['id_struktur'];
 
         if ($sukses == "Y") {
-            $cek = ['user' => $user_final, 'password' => $request->password];
+            
+            // bedakan antara civitas dan non civitas
+            if($yt_civitas=='Y'){
+    
+                $cek = ['user' => $user_final, 'password' => $request->password];
 
-            if (Auth::attempt($cek)) {
-                $request->session()->regenerate();
-                $nama_level = Level::where('id', $level)->first()->name;
+                if (Auth::guard('web')->attempt($cek)) {
+                    $request->session()->regenerate();
+                    $nama_level = Level::where('id', $level)->first()->name;
 
-                $id_bidang = UserLevel::where('nip',$nip)->first()->id_bidang??"";
-                $nama_bidang = MasterBidang::where('id', $id_bidang)->first()->nama??"";
+                    $id_bidang = UserLevel::where('nip',$nip)->first()->id_bidang??"";
+                    $nama_bidang = MasterBidang::where('id', $id_bidang)->first()->nama??"";
 
-                session([
-                    'level' => $level,
-                    'nama_level' => $nama_level,
-                    'kode_unit' => $kode_unit,
-                    'kode_jenjang' => $kode_jenjang,
-                    'nama_jenjang' => $nama_jenjang,
-                    'nama_unit' => $nama_unit,
-                    'nama_pegawai' => $nama_pegawai,
-                    'no_pegawai' => $no_pegawai,
-                    'id_bidang' => $id_bidang,
-                    'nama_bidang' => $nama_bidang,
-                    'nip' => $nip,
-                    'id_struktur' => $id_struktur,
-                ]);
+                    session([
+                        'level' => $level,
+                        'nama_level' => $nama_level,
+                        'kode_unit' => $kode_unit,
+                        'kode_jenjang' => $kode_jenjang,
+                        'nama_jenjang' => $nama_jenjang,
+                        'nama_unit' => $nama_unit,
+                        'nama_pegawai' => $nama_pegawai,
+                        'no_pegawai' => $no_pegawai,
+                        'id_bidang' => $id_bidang,
+                        'nama_bidang' => $nama_bidang,
+                        'nip' => $nip,
+                        'id_struktur' => $id_struktur,
+                    ]);
 
-                $jam = now();
-                UserLevel::where('nip', $request->user)->update(['last_login' => $jam]);
-                
-                return redirect()->intended('data-dashboard');
+                    $jam = now();
+
+                    UserLevel::where('nip', $request->user)->update(['last_login' => $jam]);
+                    
+                    return redirect()->intended('data-dashboard');
+                }
+            }else{
+                $cek = ['nip' => $user_final, 'password' => $request->password];
+
+                // dd(Auth::guard('admin')->attempt($cek));
+
+                if (Auth::guard('admin')->attempt($cek)) {
+                    $request->session()->regenerate();
+                    $nama_level = Level::where('id', $level)->first()->name;
+
+                    $id_bidang = UserLevel::where('nip', $nip)->first()->id_bidang ?? "";
+                    $nama_bidang = MasterBidang::where('id', $id_bidang)->first()->nama ?? "";
+
+                    session([
+                        'level' => $level,
+                        'nama_level' => $nama_level,
+                        'kode_unit' => $kode_unit,
+                        'kode_jenjang' => $kode_jenjang,
+                        'nama_jenjang' => $nama_jenjang,
+                        'nama_unit' => $nama_unit,
+                        'nama_pegawai' => $nama_pegawai,
+                        'no_pegawai' => $no_pegawai,
+                        'id_bidang' => $id_bidang,
+                        'nama_bidang' => $nama_bidang,
+                        'nip' => $nip,
+                        'id_struktur' => $id_struktur,
+                    ]);
+
+                    $jam = now();
+
+                    UserLevel::where('nip', $request->user)->update(['last_login' => $jam]);
+
+                    return redirect()->intended('data-dashboard');
+                }
             }
+            
         }
 
         return back()->with('loginError', $pesan);
+    
     }
 
     public function logout(Request $request)

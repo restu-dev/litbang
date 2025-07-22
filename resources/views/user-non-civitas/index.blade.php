@@ -44,7 +44,14 @@
                              <label for="nama_user">Nama User <code>*</code></label>
 
                              <input type="text" name="nama_user" class="form-control" id="nama_user"
-                                 placeholder="Nama Master">
+                                 placeholder="Input Nama">
+                         </div>
+
+                         {{-- pass_user --}}
+                         <div class="form-group">
+                             <label for="pass_user">Password User <code>*</code></label>
+
+                             <input type="password" name="pass_user" class="form-control" id="pass_user">
                          </div>
 
                          {{-- id_level --}}
@@ -155,12 +162,17 @@
                  $("#id").val(id);
                  $("#nama_user").val(nama);
                  $("#id_level").val(level).trigger("change");
+
+                 $('#pass_user').prop('disabled', true);
+                 $('#nama_user').prop('disabled', true);
+
              });
 
              //  save_form
              $(document).on("click", "#save_form", function(e) {
                  var id = $("#id").val();
                  var nama_user = $("#nama_user").val();
+                 var pass_user = $("#pass_user").val();
                  var level = $("#id_level").val();
 
                  if (nama_user == "") {
@@ -168,28 +180,62 @@
                  } else if (level == "") {
                      tampilPesan('warning', ' Level tidak boleh kosong!');
                  } else {
-                     $.ajax({
-                         url: "/store-user-non-civitas",
-                         cache: false,
-                         type: 'post',
-                         data: {
-                             id,
-                             nama_user,
-                             level,
-                             _token: '{{ csrf_token() }}'
-                         },
-                         success: function(result) {
-                             console.log(result);
-                             loadTabeMaster();
-                             $('.loader').hide();
-                             tampilPesan(result.status, result.message);
-                             resetForm();
-                         },
-                         fail: function(xhr, textStatus, errorThrown) {
-                             $('.loader').hide();
-                             tampilPesan('error', 'request failed');
+                     if (id != "") {
+                         $.ajax({
+                             url: "/store-user-non-civitas",
+                             cache: false,
+                             type: 'post',
+                             data: {
+                                 id,
+                                 nama_user,
+                                 pass_user,
+                                 level,
+                                 _token: '{{ csrf_token() }}'
+                             },
+                             success: function(result) {
+                                 console.log(result);
+                                 loadTabeMaster();
+                                 $('.loader').hide();
+                                 tampilPesan(result.status, result.message);
+                                 resetForm();
+                             },
+                             fail: function(xhr, textStatus, errorThrown) {
+                                 $('.loader').hide();
+                                 tampilPesan('error', 'request failed');
+                             }
+                         });
+                     } else {
+                         if (pass_user == "") {
+                             tampilPesan('warning', ' Password tidak boleh kosong!');
+
+                         } else {
+                             $.ajax({
+                                 url: "/store-user-non-civitas",
+                                 cache: false,
+                                 type: 'post',
+                                 data: {
+                                     id,
+                                     nama_user,
+                                     pass_user,
+                                     level,
+                                     _token: '{{ csrf_token() }}'
+                                 },
+                                 success: function(result) {
+                                     console.log(result);
+                                     loadTabeMaster();
+                                     $('.loader').hide();
+                                     tampilPesan(result.status, result.message);
+                                     resetForm();
+                                 },
+                                 fail: function(xhr, textStatus, errorThrown) {
+                                     $('.loader').hide();
+                                     tampilPesan('error', 'request failed');
+                                 }
+                             });
                          }
-                     });
+                     }
+
+
                  }
 
              });
@@ -249,7 +295,11 @@
 
              function resetForm() {
                  $("#id").val('');
+                 $("#pass_user").val('');
+                 $('#pass_user').prop('disabled', false);
+
                  $("#nama_user").val('');
+                 $('#nama_user').prop('disabled', false);
                  $("#id_level").val('').trigger("change");
              }
 

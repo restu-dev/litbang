@@ -124,6 +124,19 @@ class ApprovalController extends Controller
         $active = 'approval';
 
         $no_pegawai = session('no_pegawai');
+        $id_struktur  = session('id_struktur');
+
+        if(empty($id_struktur)){
+            return view('approval.index', [
+                'title' => $title,
+                'active' => $active,
+                'tahunAjar' => $tahunAjar,
+                'id_tahun_ajaran' => $id_tahun_ajaran,
+                'nama_tahun_ajaran' => $nama_tahun_ajaran,
+                'ada_struktur' => "T"
+            ]);
+        }
+
         // $no_pegawai = '20000497';
         $ada_struktur = $this->cekStrukturOrganisasi($no_pegawai);
 
