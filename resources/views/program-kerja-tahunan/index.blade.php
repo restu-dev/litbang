@@ -14,7 +14,7 @@
                      <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
                      <div class="card-body card-body">
-                         <div class="row justify-content-start">
+                         <div class="row">
                              {{-- filter tahun --}}
                              {{-- <div class="col-3">
                                  <select id="filter_tahun_pelajaran" class="form-control select2" style="width: 100%;">
@@ -22,13 +22,13 @@
                              </div> --}}
 
                              {{-- filter status --}}
-                             <div class="col-3">
+                             <div class="col-6 col-sm-3">
                                  <select id="filter_status_capaian" class="form-control select2" style="width: 100%;">
                                  </select>
                              </div>
 
                              {{-- filter approvement --}}
-                             <div class="col-3">
+                             <div class="col-6 col-sm-3">
                                  <select id="filter_approvement" class="form-control select2" style="width: 100%;">
                                      <option value="">-Approvement-</option>
                                      <option value="Belum">Belum</option>
@@ -74,12 +74,16 @@
                              <button type="button" title="Add" data-btn="add" class="add_edit_data btn btn-success"><i
                                      class="fa fa-add"></i> Add Data</button>
 
+                             <button id="impor_data" type="button" title="Impor Template" class="btn btn-primary"><i
+                                     class="fa fa-upload"></i> Impor data</button>
+
                              @if ($id_tahun_ajaran_lalu && !$sudahAdaProgramKerja)
-                                 <form method="POST" action="clone-program-kerja" onsubmit="return confirm('Yakin ingin menyalin program kerja dari tahun ajaran {{ $nama_tahun_ajaran_lalu }}?');">
+                                 <form method="POST" action="clone-program-kerja"
+                                     onsubmit="return confirm('Yakin ingin menyalin program kerja dari tahun ajaran {{ $nama_tahun_ajaran_lalu }}?');">
                                      @csrf
                                      <input type="hidden" name="id_tahun_sekarang" value="{{ $id_tahun_ajaran }}">
                                      <input type="hidden" name="id_tahun_lalu" value="{{ $id_tahun_ajaran_lalu }}">
-                                     <button type="submit" class="btn btn-warning">
+                                     <button style="border-radius: 0;" type="submit" class="btn btn-warning">
                                          📋 Ambil dari Program Kerja Tahun Lalu:
                                          <strong>{{ $nama_tahun_ajaran_lalu }}</strong>
                                      </button>
@@ -154,12 +158,13 @@
                          {{-- Indikator Kinerja --}}
                          <div class="form-group">
                              <label for="indikator_kinerja">Indikator Kinerja <code>*</code></label>
-                             <textarea name="indikator_kinerja" id="indikator_kinerja" class="form-control" placeholder="Input Indikator Kinerja"></textarea>
+                             <textarea name="indikator_kinerja" id="indikator_kinerja" class="form-control"
+                                 placeholder="Input Indikator Kinerja"></textarea>
                          </div>
 
                          {{-- Status Capaian --}}
                          <div class="form-group">
-                             <label for="status_capaian">Status Capaian</label>
+                             <label for="status_capaian">Status Capaian <code>*</code></label>
 
                              <select id="status_capaian" class="form-control select2" style="width: 100%;">
                              </select>
@@ -176,6 +181,70 @@
                      <div class="modal-footer justify-content-between">
                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                          <button type="button" id="save_form" class="btn btn-primary">Simpan</button>
+                     </div>
+                 </div>
+             </div>
+         </div>
+
+         {{-- mdal impor excel --}}
+         <div class="modal fade" id="modal_impor_data">
+             <div class="modal-dialog modal-xl">
+                 <div class="modal-content">
+
+                     <div class="modal-header">
+                         <form id="upload" method="POST" enctype="multipart/form-data">
+
+                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                             <div class="row">
+
+                                 <div style="margin:0px" class="col-md-6 col-sm-12  form-group">
+                                     <div class="custom-file">
+                                         <input required type="file" class="form-control" id="file"
+                                             name="file">
+                                     </div>
+                                 </div>
+
+                                 <div style="margin:0px" class="col-md-6 col-sm-12  form-group">
+                                     <div class="btn-group">
+
+                                         <button type="submit" value="Preview" class="btn btn-warning">Preview</button>
+
+                                         <a href="/download-template-impor-program-kerja" class="btn btn-info">
+                                             <i class="fa fa-download"></i> Download Template</button>
+                                         </a>
+
+                                     </div>
+                                 </div>
+
+                             </div>
+
+                         </form>
+
+                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                             <span aria-hidden="true">&times;</span>
+                         </button>
+                     </div>
+
+                     <div class="modal-body">
+                         <table id="tabel_impor_data" class="table table-bordered table-striped">
+                             <thead>
+                                 <tr class="headings">
+                                     <th style="padding: 4px 5px 4px 4px;" class="column-title">No </th>
+                                     <th style="padding: 4px 5px 4px 4px;" class="column-title">Program Kerja</th>
+                                     <th style="padding: 4px 5px 4px 4px;" class="column-title">Target Frekuensi Tahunan
+                                     </th>
+                                     <th style="padding: 4px 5px 4px 4px;" class="column-title">Indikator Kinerja</th>
+                                     <th style="padding: 4px 5px 4px 4px;" class="column-title">Keterangan</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                             </tbody>
+                         </table>
+                     </div>
+                     <div class="modal-footer justify-content-between">
+                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                         <button type="button" id="prosesImport" class="btn btn-primary">Impor</button>
                      </div>
                  </div>
              </div>
@@ -481,8 +550,6 @@
                          tampilPesan('warning', ' Indikator Kinerja tidak boleh kosong!');
                      } else if (status_capaian == null) {
                          tampilPesan('warning', ' Status Capaian tidak boleh kosong!');
-                     } else if (keterangan == "") {
-                         tampilPesan('warning', ' Keterangan tidak boleh kosong!');
                      } else {
                          $.ajax({
                              url: "simpan-program-kerja-tahunan",
@@ -598,6 +665,130 @@
                      $("#status_capaian").val('').trigger("change");
                      $("#keterangan").val('');
                  }
+
+
+                 // ============  proses impor data
+
+                 // tampil modal impor data
+                 $(document).on("click", "#impor_data", function(e) {
+                     e.stopPropagation();
+                     e.stopImmediatePropagation();
+                     e.preventDefault();
+
+                     $("#modal_impor_data").modal("show");
+                 });
+
+                 //  tutup modal
+                 $('#modal_impor_data').on('hidden.bs.modal', function() {
+                     location.reload();
+                 });
+
+                 //  preview
+                 $("form#upload").submit(function(e) {
+
+                     e.preventDefault();
+
+                     var formData = new FormData($(this)[0]);
+
+                     $.ajax({
+                         url: "import-preview-program-kerja-tahunan",
+                         type: "POST",
+                         data: formData,
+                         processData: false,
+                         contentType: false,
+                         success: function(result) {
+                             openPreview(result);
+                         },
+                         error: function() {
+
+                         }
+                     });
+                 });
+
+                 function openPreview(e) {
+                     $('#tabel_impor_data').DataTable().destroy();
+                     var t = $('#tabel_impor_data').DataTable({
+                         "bDestroy": true,
+                         "buttons": ["copy", "excel"],
+                         "ordering": true,
+                         "autoWidth": false,
+                         "searching": true,
+                         "scrollY": "375px",
+                         "scrollX": true,
+                         "scrollCollapse": true,
+                         "paging": false,
+                         "fixedColumns": true,
+                         "fixedHeader": {
+                             header: true,
+                             footer: true
+                         },
+                         "data": e,
+                         "columns": [{
+                                 data: 'no',
+                                 render: function(data, type, row, meta) {
+                                     return meta.row + 1;
+                                 },
+                                 className: "align-middle text-center",
+                                 width: 5,
+                             },
+                             {
+                                 data: 'program_kerja',
+                                 className: "align-middle text-center",
+                                 width: 10,
+                             },
+                             {
+                                 data: 'target_frekuensi_tahunan',
+                                 className: "align-middle text-center",
+                                 width: 10,
+                             },
+                             {
+                                 data: 'indikator_kinerja',
+                                 className: "align-middle text-center",
+                                 width: 10,
+                             },
+                             {
+                                 data: 'keterangan',
+                                 className: "align-middle text-center",
+                                 width: 10,
+                             },
+                         ],
+                     });
+
+                     t.on('order.dt search.dt', function() {
+                         t.column(0, {
+                             search: 'applied',
+                             order: 'applied'
+                         }).nodes().each(function(cell, i) {
+                             cell.innerHTML = i + 1;
+                         });
+                     }).draw();
+
+                 }
+
+                 $(document).on("click", "#prosesImport", function(e) {
+                     e.stopPropagation();
+                     e.stopImmediatePropagation();
+                     e.preventDefault();
+
+                     prosesImport();
+                 })
+
+                 function prosesImport() {
+                     var rows = $('#tabel_impor_data').DataTable().rows().data().toArray();
+
+                     $.post('{{ URL::to('proses-imports-program-kerja-tahunan') }}', {
+                         rows,
+                         _token: '{{ csrf_token() }}'
+                     }, function(e) {
+
+                         $("#modal_impor_data").modal("hide");
+
+                         location.reload();
+                     });
+                 }
+
+
+                 //  =========== #proses impor data
 
              });
          </script>

@@ -72,7 +72,13 @@
                  @if (session('kode_unit') == '001')
                      <img src="/admin_template/dist/img/avatar4.png" class="img-circle elevation-2" alt="User Image">
                  @else
-                     <img src="/admin_template/dist/img/avarat_pi.png" class="img-circle elevation-2" alt="User Image">
+                     @if (session('kode_unit') == '')
+                         <img src="/admin_template/dist/img/avatar4.png" class="img-circle elevation-2"
+                             alt="User Image">
+                     @else
+                         <img src="/admin_template/dist/img/avarat_pi.png" class="img-circle elevation-2"
+                             alt="User Image">
+                     @endif
                  @endif
              </div>
              <div class="info">

@@ -95,10 +95,12 @@
                      _token: '{{ csrf_token() }}'
                  }, function(e) {
                      var tabel = $("#tabel_master").DataTable({
-                         "responsive": true,
-                         "lengthChange": false,
-                         "autoWidth": false,
                          "buttons": ["excel", "pdf", "print"],
+                         "autoWidth": false,
+                         "searching": true,
+                         "paging": false,
+                         "fixedColumns": true,
+                         "scrollX": true,
                          "data": e,
                          "columns": [{
                                  data: 'id',

@@ -6,64 +6,55 @@
  @endsection
 
  @section('content')
-     {{-- filter --}}
-     <div class="row">
-         <div class="col-lg-12">
-             <div class="card">
-                 <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
-
-                 <div class="card-body card-body">
-                     <div class="row justify-content-start">
-                        {{-- date range --}}
-                         <div class="col">
-                             <div class="input-group">
-                                 <div class="input-group-prepend">
-                                     <span class="input-group-text">
-                                         <i class="far fa-calendar-alt"></i>
-                                     </span>
-                                 </div>
-                                 <input type="text" class="form-control float-right" id="filter_tgl">
-                             </div>
-                         </div>
-
-                          {{-- filter ada_tidak_program_kerja --}}
-                            <div class="col">
-                                <select id="filter_ada_tidak_program_kerja" class="form-control select2" style="width: 100%;">
+    {{-- filter --}}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+                <div class="card-body">
+                    <form>
+                        <div class="row g-3">
+                            {{-- date range --}}
+                            <div class="col-12 col-md-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="far fa-calendar-alt"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="filter_tgl" placeholder="Tanggal">
+                                </div>
+                            </div>
+                            {{-- filter ada_tidak_program_kerja --}}
+                            <div class="col-12 col-md-2">
+                                <select id="filter_ada_tidak_program_kerja" class="form-control select2"
+                                    style="width: 100%;">
                                     <option value="">-Ada / Tidak Program-</option>
                                     <option value="Y">Ada</option>
                                     <option value="T">Tidak</option>
                                 </select>
                             </div>
-
-                         {{-- filter_bidang --}}
-                         <div class="col">
-                             <select id="filter_bidang" class="form-control select2" style="width: 100%;">
-                             </select>
-                         </div>
-
-                         {{-- filter_jenis_kegiatan --}}
-                         <div class="col">
-                             <select id="filter_jenis_kegiatan" class="form-control select2" style="width: 100%;">
-                             </select>
-                         </div>
-
-                         {{-- filter_program_kerja --}}
-                         {{-- <div class="col-3">
-                             <select id="filter_program_kerja" class="form-control select2" style="width: 100%;">
-                             </select>
-                         </div> --}}
-
-                         {{-- filter pencapaian --}}
-                         <div class="col">
-                             <select id="filter_status_pencapaian" class="form-control select2" style="width: 100%;">
-                             </select>
-                         </div>
-
-                     </div>
-                 </div>
-             </div>
-         </div>
-     </div>
+                            @if (Auth::guard('admin')->check())
+                                {{-- filter_bidang --}}
+                                {{-- <div class="col-12 col-md-2">
+                                    <select id="filter_bidang" class="form-control select2" style="width: 100%;">
+                                    </select>
+                                </div> --}}
+                            @endif
+                            {{-- filter_jenis_kegiatan --}}
+                            <div class="col-12 col-md-2">
+                                <select id="filter_jenis_kegiatan" class="form-control select2" style="width: 100%;">
+                                </select>
+                            </div>
+                            {{-- filter pencapaian --}}
+                            <div class="col-12 col-md-3">
+                                <select id="filter_status_pencapaian" class="form-control select2" style="width: 100%;">
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
      <div class="row">
          <div class="col-lg-12">
@@ -95,6 +86,30 @@
                              </tr>
                          </thead>
                      </table>
+                 </div>
+
+             </div>
+         </div>
+     </div>
+
+     {{-- modal preview dokumen --}}
+     <div class="modal fade" id="modal_preview_dokumen">
+         <div class="modal-dialog modal-lg">
+             <div class="modal-content">
+
+                 <div class="modal-header">
+                     <h4 class="modal-title">Preview Dokumen</h4>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                         <span aria-hidden="true">&times;</span>
+                     </button>
+                 </div>
+
+                 <div class="modal-body">
+                     <div id="preview_dokumen"></div>
+                 </div>
+
+                 <div class="modal-footer justify-content-between">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                  </div>
 
              </div>
@@ -214,10 +229,11 @@
                  var filter_tgl = $("#filter_tgl").val();
                  var filter_ada_tidak_program_kerja = $("#filter_ada_tidak_program_kerja").val();
 
-                 loadTabelData(filter_tgl,filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian,filter_bidang, filter_ada_tidak_program_kerja);
+                 loadTabelData(filter_tgl, filter_jenis_kegiatan, filter_program_kerja,
+                     filter_status_pencapaian, filter_bidang, filter_ada_tidak_program_kerja);
              });
 
-            // on change filter_ada_tidak_program_kerja
+             // on change filter_ada_tidak_program_kerja
              $('#filter_ada_tidak_program_kerja').on("change", function(e) {
 
                  var filter_jenis_kegiatan = $("#filter_jenis_kegiatan").val();
@@ -227,7 +243,8 @@
                  var filter_tgl = $("#filter_tgl").val();
                  var filter_ada_tidak_program_kerja = $("#filter_ada_tidak_program_kerja").val();
 
-                 loadTabelData(filter_tgl,filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian,filter_bidang, filter_ada_tidak_program_kerja);
+                 loadTabelData(filter_tgl, filter_jenis_kegiatan, filter_program_kerja,
+                     filter_status_pencapaian, filter_bidang, filter_ada_tidak_program_kerja);
              });
 
              // on change filter_jenis_kegiatan
@@ -240,7 +257,8 @@
                  var filter_tgl = $("#filter_tgl").val();
                  var filter_ada_tidak_program_kerja = $("#filter_ada_tidak_program_kerja").val();
 
-                 loadTabelData(filter_tgl,filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian,filter_bidang, filter_ada_tidak_program_kerja);
+                 loadTabelData(filter_tgl, filter_jenis_kegiatan, filter_program_kerja,
+                     filter_status_pencapaian, filter_bidang, filter_ada_tidak_program_kerja);
              });
 
              // on change filter_program_kerja
@@ -253,7 +271,8 @@
                  var filter_tgl = $("#filter_tgl").val();
                  var filter_ada_tidak_program_kerja = $("#filter_ada_tidak_program_kerja").val();
 
-                 loadTabelData(filter_tgl,filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian,filter_bidang, filter_ada_tidak_program_kerja);
+                 loadTabelData(filter_tgl, filter_jenis_kegiatan, filter_program_kerja,
+                     filter_status_pencapaian, filter_bidang, filter_ada_tidak_program_kerja);
              });
 
              // on change filter_status_pencapaian
@@ -266,7 +285,8 @@
                  var filter_tgl = $("#filter_tgl").val();
                  var filter_ada_tidak_program_kerja = $("#filter_ada_tidak_program_kerja").val();
 
-                 loadTabelData(filter_tgl,filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian,filter_bidang, filter_ada_tidak_program_kerja);
+                 loadTabelData(filter_tgl, filter_jenis_kegiatan, filter_program_kerja,
+                     filter_status_pencapaian, filter_bidang, filter_ada_tidak_program_kerja);
              });
 
              // on change filter_bidang
@@ -279,14 +299,16 @@
                  var filter_tgl = $("#filter_tgl").val();
                  var filter_ada_tidak_program_kerja = $("#filter_ada_tidak_program_kerja").val();
 
-                 loadTabelData(filter_tgl,filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian,filter_bidang, filter_ada_tidak_program_kerja);
+                 loadTabelData(filter_tgl, filter_jenis_kegiatan, filter_program_kerja,
+                     filter_status_pencapaian, filter_bidang, filter_ada_tidak_program_kerja);
              });
 
              loadTabelData('', '', '', '', '', '');
 
              // load tabel
-             function loadTabelData(filter_tgl,filter_jenis_kegiatan, filter_program_kerja, filter_status_pencapaian,
-                 filter_bidang,filter_ada_tidak_program_kerja) {
+             function loadTabelData(filter_tgl, filter_jenis_kegiatan, filter_program_kerja,
+                 filter_status_pencapaian,
+                 filter_bidang, filter_ada_tidak_program_kerja) {
                  $('.loader').show();
 
                  $('#tabel_master').DataTable().destroy();
@@ -395,6 +417,22 @@
                      $('.loader').hide();
                  });
              }
+
+             //  modal_preview_dokumen
+             $(document).on("click", ".preview_dokumen", function(e) {
+                 var id = $(this).data('id');
+                 var jenis = $(this).data('jenis');
+
+                 $.post('{{ URL::to('preview-dokumen') }}', {
+                     id,
+                     jenis,
+                     _token: '{{ csrf_token() }}'
+                 }, function(e) {
+                     $("#modal_preview_dokumen").modal("show");
+                     $("#preview_dokumen").html(e);
+                 });
+
+             });
 
          });
      </script>

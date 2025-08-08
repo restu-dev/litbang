@@ -74,6 +74,28 @@
          </div>
 
      </div>
+
+     {{-- modal bawahan --}}
+     <div class="modal fade" id="modal-lg-bawahan">
+         <div class="modal-dialog modal-lg">
+             <div class="modal-content">
+
+                 <div class="modal-header">
+                     <h4 class="modal-title-bawahan">Large Modal</h4>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                         <span aria-hidden="true">&times;</span>
+                     </button>
+                 </div>
+
+                 <div class="p-2" id="tampil_bawahan"></div>
+
+                 <div class="modal-footer justify-content-between">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                 </div>
+
+             </div>
+         </div>
+     </div>
  @endsection
 
  @section('script')
@@ -85,6 +107,7 @@
 
              function loadSelectLevel() {
                  $('.loader').show()
+                 
                  $('#id_level').empty()
 
                  $.post('{{ URL::to('select-level') }}', {
@@ -111,10 +134,12 @@
                      _token: '{{ csrf_token() }}'
                  }, function(e) {
                      var tabel = $("#tabel_master").DataTable({
-                         "responsive": true,
-                         "lengthChange": false,
-                         "autoWidth": false,
                          "buttons": ["excel", "pdf", "print"],
+                         "autoWidth": false,
+                         "searching": true,
+                         "paging": false,
+                         "fixedColumns": true,
+                         "scrollX": true,
                          "data": e,
                          "columns": [{
                                  data: 'id',
@@ -163,7 +188,7 @@
                  $("#nama_user").val(nama);
                  $("#id_level").val(level).trigger("change");
 
-                 $('#pass_user').prop('disabled', true);
+                 //  $('#pass_user').prop('disabled', true);
                  $('#nama_user').prop('disabled', true);
 
              });
@@ -302,6 +327,37 @@
                  $('#nama_user').prop('disabled', false);
                  $("#id_level").val('').trigger("change");
              }
+
+             //  mapping_bawahan
+             $(document).on("click", ".mapping_bawahan", function(e) {
+                 var id = $(this).data('id');
+
+                 $.ajax({
+                     url: '/tampil-mapping-bawahan',
+                     cache: false,
+                     type: 'post',
+                     data: {
+                         id,
+                         _token: '{{ csrf_token() }}'
+                     },
+                     success: function(result) {
+
+                         $("#modal-lg-bawahan").modal("show");
+                         $(".modal-title-bawahan").html('Mapping Bawahan');
+
+                         console.log(result);
+
+                         $('#tampil_bawahan').html(result);
+
+                     },
+                     fail: function(xhr, textStatus, errorThrown) {
+                         $('.loader').hide();
+                         tampilPesan('error', 'request failed');
+                     }
+                 })
+
+
+             });
 
          });
      </script>

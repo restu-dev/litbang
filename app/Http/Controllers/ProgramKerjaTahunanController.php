@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProgramKerjaTahunanController extends Controller
 {
@@ -16,35 +17,35 @@ class ProgramKerjaTahunanController extends Controller
         $hariIni = Carbon::now()->toDateString();
 
         $tahunAjar = DB::table('master_tahun_pelajaran')
-        ->whereDate('awal', '<=', $hariIni)
-        ->whereDate('akhir', '>=', $hariIni)
-        ->first();
+            ->whereDate('awal', '<=', $hariIni)
+            ->whereDate('akhir', '>=', $hariIni)
+            ->first();
 
         $id_tahun_ajaran = $tahunAjar ? $tahunAjar->id : null;
         $nama_tahun_ajaran = $tahunAjar ? $tahunAjar->nama : null;
         $awal = $tahunAjar ? $tahunAjar->awal : null;
 
-        $title = 'Program Kerja Tahunan '. $nama_tahun_ajaran.' - '. session('nama_bidang');;
+        $title = 'Program Kerja Tahunan ' . $nama_tahun_ajaran . ' - ' . session('nama_bidang');;
         $active = 'program-kerja-tahunan';
 
         // Ambil 1 tahun ajaran sebelumnya secara otomatis
-        $tahunLalu="";
-        if($awal){
+        $tahunLalu = "";
+        if ($awal) {
             $tahunLalu = DB::table('master_tahun_pelajaran')
-            ->where('awal', '<', $awal)
-            ->orderByDesc('awal')
-            ->first();
+                ->where('awal', '<', $awal)
+                ->orderByDesc('awal')
+                ->first();
         }
 
         $id_tahun_ajaran_lalu = $tahunLalu ? $tahunLalu->id : null;
         $nama_tahun_ajaran_lalu = $tahunLalu ? $tahunLalu->nama : null;
 
-        $adaProgramKerja="";
-        if($id_tahun_ajaran){
+        $adaProgramKerja = "";
+        if ($id_tahun_ajaran) {
             $adaProgramKerja = DB::table('program_kerja_tahunan')
-            ->where('id_tahun_pelajaran', $id_tahun_ajaran)
-            ->where('penanggung_jawab', $no_pegawai)
-            ->exists();
+                ->where('id_tahun_pelajaran', $id_tahun_ajaran)
+                ->where('penanggung_jawab', $no_pegawai)
+                ->exists();
         }
 
         return view('program-kerja-tahunan.index', [
@@ -59,6 +60,101 @@ class ProgramKerjaTahunanController extends Controller
         ]);
     }
 
+    // ========== import
+    // downloadTemplateImporProgramKerja
+    public function downloadTemplateImporProgramKerja($filename = 'impor_program_kerja_tahunan.xlsx')
+    {
+        // Get path from storage directory
+        $path = public_path('template_impor/' . $filename);
+        // Download file with custom headers
+        return response()->download($path, $filename, [
+            'Content-Type' => 'application/vnd.ms-excel',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"'
+        ]);
+    }
+
+    // importPreviewProgramKerjaTahunan
+    public function importPreviewProgramKerjaTahunan()
+    {
+        move_uploaded_file($_FILES['file']['tmp_name'], "upload/temp/" . $_FILES['file']['name']);
+        $inputFileName = './upload/temp/' . $_FILES['file']['name'];
+
+        return $this->bacaFileImport($inputFileName);
+        unlink($inputFileName);
+    }
+
+    // baca file impor
+    public function bacaFileImport($file)
+    {
+
+        $rows = Excel::toArray([], $file);
+
+        for ($i = 0; $i < count($rows); $i++) {
+
+            unset($rows[$i][0]);
+
+            for ($a = 1; $a <= count($rows[$i]); $a++) {
+                $no = $rows[$i][$a][0];
+                $program_kerja = $rows[$i][$a][1];
+                $target_frekuensi_tahunan = $rows[$i][$a][2];
+                $indikator_kinerja = $rows[$i][$a][3];
+                $keterangan = $rows[$i][$a][4];
+
+                $return[] = array(
+                    "no" => $no,
+                    "program_kerja" => $program_kerja,
+                    "target_frekuensi_tahunan" => $target_frekuensi_tahunan,
+                    "indikator_kinerja" => $indikator_kinerja,
+                    "keterangan" => $keterangan,
+                );
+            }
+        }
+
+        return $return;
+    }
+
+    public function prosesImportsProgramKerjaTahunan()
+    {
+        $no_pegawai = session('no_pegawai');
+        $id_bidang  = session('id_bidang');
+
+        $hariIni = Carbon::now()->toDateString();
+        $tahunAjar = DB::table('master_tahun_pelajaran')
+            ->whereDate('awal', '<=', $hariIni)
+            ->whereDate('akhir', '>=', $hariIni)
+            ->first()->id;
+
+        $status_capaian = "6"; // Scheduled
+
+        $rows = $_POST['rows'];
+
+        foreach ($rows as $key => $value) {
+
+            $program_kerja = $value['program_kerja'];
+            $target_frekuensi_tahunan = $value['target_frekuensi_tahunan'];
+            $indikator_kinerja = $value['indikator_kinerja'];
+            $keterangan = $value['keterangan'];
+
+            $data = [
+                "id_tahun_pelajaran" => $tahunAjar,
+                "id_bidang" => $id_bidang,
+                "program_kerja" => $program_kerja,
+                "penanggung_jawab" => $no_pegawai,
+                "target_frekuensi_tahunan" => $target_frekuensi_tahunan,
+                "indikator_kinerja" => $indikator_kinerja,
+                "id_status_capaian" => $status_capaian,
+                "keterangan" => $keterangan,
+                "approvement" => "Belum",
+                "user_created" => $no_pegawai,
+                "created_at" => date('Y-m-d H:i:s'),
+            ];
+
+            ProgramKerjaTahunan::insert($data);
+        }
+    }
+
+    // ======== #impor
+
     public function cloneDariTahunLalu(Request $request)
     {
         $no_pegawai = session('no_pegawai');
@@ -67,9 +163,9 @@ class ProgramKerjaTahunanController extends Controller
 
         // 🔍 Cek apakah data program kerja tahun sekarang sudah ada
         $sudahAda = DB::table('program_kerja_tahunan')
-        ->where('id_tahun_pelajaran', $id_tahun_sekarang)
-        ->where('penanggung_jawab', $no_pegawai)
-        ->exists();
+            ->where('id_tahun_pelajaran', $id_tahun_sekarang)
+            ->where('penanggung_jawab', $no_pegawai)
+            ->exists();
 
         if ($sudahAda) {
             return redirect()->back()->with('error', 'Data program kerja untuk tahun ajaran ini sudah ada. Duplikasi dicegah.');
@@ -77,9 +173,9 @@ class ProgramKerjaTahunanController extends Controller
 
         // Ambil data dari tahun lalu
         $dataTahunLalu = DB::table('program_kerja_tahunan')
-        ->where('id_tahun_pelajaran', $id_tahun_lalu)
-        ->where('penanggung_jawab', $no_pegawai)
-        ->get();
+            ->where('id_tahun_pelajaran', $id_tahun_lalu)
+            ->where('penanggung_jawab', $no_pegawai)
+            ->get();
 
         if ($dataTahunLalu->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data program kerja tahun lalu.');
@@ -145,8 +241,11 @@ class ProgramKerjaTahunanController extends Controller
                             AND d.id='$id_tahun_ajaran'
                             ORDER BY created_at ASC");
 
-        for($i=0;$i<count($data);$i++){
+        for ($i = 0; $i < count($data); $i++) {
             $id = $data[$i]->id;
+            $pro_capaian = $data[$i]->pro_capaian;
+
+            $data[$i]->pro_capaian = $pro_capaian . ' %';
 
             $aksi = "<div class='btn-group'>
                       <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm add_edit_data'>
@@ -157,7 +256,7 @@ class ProgramKerjaTahunanController extends Controller
                       </button>
                      </div>";
 
-            $data[$i]->aksi=$aksi;
+            $data[$i]->aksi = $aksi;
         }
 
         return $data;
@@ -168,10 +267,10 @@ class ProgramKerjaTahunanController extends Controller
     {
         $id                         = $request->id;
         $tahun_pelajaran            = $request->tahun_pelajaran;
-        $program_kerja              = $request->program_kerja; 
-        $target_frekuensi_tahunan   = $request->target_frekuensi_tahunan; 
-        $indikator_kinerja          = $request->indikator_kinerja; 
-        $status_capaian             = $request->status_capaian; 
+        $program_kerja              = $request->program_kerja;
+        $target_frekuensi_tahunan   = $request->target_frekuensi_tahunan;
+        $indikator_kinerja          = $request->indikator_kinerja;
+        $status_capaian             = $request->status_capaian;
         $keterangan                 = $request->keterangan;
         $id_bidang                  = session('id_bidang');
 
@@ -190,7 +289,7 @@ class ProgramKerjaTahunanController extends Controller
             ];
 
             if ($id == NULL) {
-                 
+
                 $data['approvement']   = "Belum";
                 $data['user_created']  = session('no_pegawai');
                 $data['created_at']    = date('Y-m-d H:i:s');
@@ -203,7 +302,7 @@ class ProgramKerjaTahunanController extends Controller
                     'pesan' => "Berhasil Simpan Data..",
                 );
             } else {
-            
+
                 $data['user_updated']  = session('no_pegawai');
                 $data['updated_at']    = date('Y-m-d H:i:s');
 
@@ -239,7 +338,7 @@ class ProgramKerjaTahunanController extends Controller
 
         $data = ProgramKerjaTahunan::where('id', $id)->first();
         $no_pegawai = $data->penanggung_jawab;
-        $nama_pegawai = DB::table('simpia.Data_Induk_Pegawai')->where('no_pegawai',$no_pegawai)->first()->nama_pegawai;
+        $nama_pegawai = DB::table('simpia.Data_Induk_Pegawai')->where('no_pegawai', $no_pegawai)->first()->nama_pegawai;
 
         $data['id_tahun_pelajaran'] = $data->id_tahun_pelajaran;
         $data['program_kerja'] = $data->program_kerja;

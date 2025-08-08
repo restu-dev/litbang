@@ -21,21 +21,21 @@
                          <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
                          <div class="card-body card-body">
-                             <div class="row justify-content-start">
+                             <div class="row">
                                  {{-- filter_jenis_kegiatan --}}
-                                 <div class="col-3">
+                                 <div class="col-4 col-sm-4">
                                      <select id="filter_jenis_kegiatan" class="form-control select2" style="width: 100%;">
                                      </select>
                                  </div>
 
                                  {{-- filter_program_kerja --}}
-                                 <div class="col-3">
+                                 <div class="col-4 col-sm-4">
                                      <select id="filter_program_kerja" class="form-control select2" style="width: 100%;">
                                      </select>
                                  </div>
 
                                  {{-- filter approvement --}}
-                                 <div class="col-3">
+                                 <div class="col-4 col-sm-4">
                                      <select id="filter_status_pencapaian" class="form-control select2"
                                          style="width: 100%;">
                                      </select>
@@ -104,7 +104,8 @@
                              @csrf
 
                              <input type="hidden" name="id" id="id">
-                             <input type="hidden" value="{{ $id_tahun_ajaran }}" name="id_tahun_ajaran" id="id_tahun_ajaran">
+                             <input type="hidden" value="{{ $id_tahun_ajaran }}" name="id_tahun_ajaran"
+                                 id="id_tahun_ajaran">
 
                              {{-- uraian_kegiatan --}}
                              <div class="form-group">
@@ -189,6 +190,30 @@
                      </div>
 
                      </form>
+                 </div>
+             </div>
+         </div>
+
+         {{-- modal preview dokumen --}}
+         <div class="modal fade" id="modal_preview_dokumen">
+             <div class="modal-dialog modal-lg">
+                 <div class="modal-content">
+
+                     <div class="modal-header">
+                         <h4 class="modal-title">Preview Dokumen</h4>
+                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                             <span aria-hidden="true">&times;</span>
+                         </button>
+                     </div>
+
+                     <div class="modal-body">
+                        <div id="preview_dokumen"></div>
+                     </div>
+
+                     <div class="modal-footer justify-content-between">
+                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                     </div>
+
                  </div>
              </div>
          </div>
@@ -637,6 +662,22 @@
                      $("#id_program_kerja_tahunan").val('').trigger("change");
                      $("#id_status_pencapaian").val('').trigger("change");
                  }
+
+                 //  modal_preview_dokumen
+                 $(document).on("click", ".preview_dokumen", function(e) {
+                    var id = $(this).data('id');
+                    var jenis = $(this).data('jenis');
+
+                     $.post('{{ URL::to('preview-dokumen') }}', {
+                         id,
+                         jenis,
+                         _token: '{{ csrf_token() }}'
+                     }, function(e) {
+                         $("#modal_preview_dokumen").modal("show");
+                         $("#preview_dokumen").html(e);
+                     });
+
+                 });
 
              });
          </script>

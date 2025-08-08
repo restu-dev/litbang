@@ -156,7 +156,33 @@ class SelectController extends Controller
         return $data;
     }
 
+    public function getCivitasByNip($nip)
+    {
+        $data = DB::select("SELECT * FROM simpia.Data_Induk_Pegawai
+                            WHERE NIP='$nip'");
 
+        return $data[0]->nama_pegawai;
+    }
+
+    public function getUserLevel()
+    {
+        $data = DB::select("SELECT * FROM user_level");
+
+        for($i=0;$i<count($data);$i++){
+            $yt_civitas = $data[$i]->yt_civitas;
+            $nip = $data[$i]->nip;
+
+            if($yt_civitas=="Y"){
+                $nama = $this->getCivitasByNip($nip);
+            }else{
+                $nama = $nip;
+            }
+
+            $data[$i]->text = $nama;
+        }
+
+        return $data;
+    }
   
 
 }

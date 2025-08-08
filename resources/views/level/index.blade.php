@@ -76,10 +76,12 @@
                      _token: '{{ csrf_token() }}'
                  }, function(e) {
                      var tabel = $("#tabel_level").DataTable({
-                         "responsive": true,
-                         "lengthChange": false,
+                         "buttons": ["excel", "pdf", "print"],
                          "autoWidth": false,
-                         "buttons": ["copy", "csv", "excel", "pdf", "print"],
+                         "searching": true,
+                         "paging": false,
+                         "fixedColumns": true,
+                         "scrollX": true,
                          "data": e,
                          "columns": [{
                                  data: 'id',

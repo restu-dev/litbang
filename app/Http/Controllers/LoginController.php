@@ -182,7 +182,7 @@ class LoginController extends Controller
             $nama_unit = "";
             $no_pegawai = $ck->nip;
             $nip = $ck->nip;
-            $id_struktur = "";
+            $id_struktur = "144";
         }
 
         if ($lanjut) {

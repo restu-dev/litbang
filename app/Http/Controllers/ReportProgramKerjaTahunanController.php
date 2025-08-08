@@ -2,22 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProgramKerjaTahunan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Models\ProgramKerjaTahunan;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Repositories\HelperRepositories;
 
 class ReportProgramKerjaTahunanController extends Controller
 {
+    protected $helper;
+
+    public function __construct(HelperRepositories $helper)
+    {
+        $this->helper = $helper;
+    }
+
     public function index()
     {
         $hariIni = Carbon::now()->toDateString();
 
         $tahunAjar = DB::table('master_tahun_pelajaran')
-        ->whereDate('awal', '<=', $hariIni)
-        ->whereDate('akhir', '>=', $hariIni)
-        ->first();
+            ->whereDate('awal', '<=', $hariIni)
+            ->whereDate('akhir', '>=', $hariIni)
+            ->first();
 
         $id_tahun_ajaran = $tahunAjar ? $tahunAjar->id : null;
         $nama_tahun_ajaran = $tahunAjar ? $tahunAjar->nama : null;
@@ -37,6 +45,12 @@ class ReportProgramKerjaTahunanController extends Controller
     // loadTabelReportProgramKerjaTahunan
     public function loadTabelReportProgramKerjaTahunan(Request $request)
     {
+        // $no_pegawai = '20000497';
+        // $id_struktur = '525';
+
+        $no_pegawai   = session('no_pegawai');
+        $id_struktur  = session('id_struktur');
+
         $id_tahun_ajaran = $request->id_tahun_ajaran;
 
         $filter_status_capaian = $request->filter_status_capaian;
@@ -47,7 +61,7 @@ class ReportProgramKerjaTahunanController extends Controller
         $Ftahun = '';
         if (!empty($filter_tahun)) {
             $Ftahun = "AND a.id_tahun_pelajaran='$filter_tahun'";
-        }else{
+        } else {
             $Ftahun = "AND a.id_tahun_pelajaran='$id_tahun_ajaran'";
         }
 
@@ -66,8 +80,25 @@ class ReportProgramKerjaTahunanController extends Controller
             $Fbidang = "AND a.id_bidang='$filter_bidang'";
         }
 
+        /*
+        2. reporting
+            - user non civitas bisa akses semua reporting
 
-        $data = DB::select("SELECT a.*,
+            - user civitas
+                1. yg tdak ada struktur dibawahnya hanya bisa lihat miliknya sendiri
+                2. yg ada bisa melihat milik struktur dibawahnya
+        */
+
+        // bedakan user civitas dan non civitas
+        if (Auth::guard('admin')->check()) {
+            //    noncivitas
+            $penanggung = $this->helper->listPegawai($id_struktur);
+
+            $list = "'" . implode("','", $penanggung) . "'";
+
+            $Fpegawai = "AND a.penanggung_jawab IN ($list)";
+
+            $data = DB::select("SELECT a.*,
                                 b.nama AS nama_status_pencapaian,
                                 c.nama_pegawai,
                                 d.nama AS nama_tahun_pelajaran
@@ -80,15 +111,50 @@ class ReportProgramKerjaTahunanController extends Controller
                             {$Fapprove}
                             {$Ftahun}
                             {$Fbidang}
+                            {$Fpegawai}
                             ORDER BY created_at ASC");
+        } elseif (Auth::guard('web')->check()) {
+            // civitas
+            // 1. yg tdak ada struktur dibawahnya hanya bisa lihat miliknya sendiri
+            // 2. yg ada bisa melihat milik struktur dibawahnya
 
-        for($i=0;$i<count($data);$i++){
+
+            $ada_struktur = $this->helper->cekStrukturOrganisasi($no_pegawai);
+
+            if ($ada_struktur == 'T') {
+                $Fpegawai = "AND a.penanggung_jawab='$no_pegawai'";
+            } else {
+                $penanggung = $this->helper->listPegawai($id_struktur);
+
+                $list = "'" . implode("','", $penanggung) . "'";
+
+                $Fpegawai = "AND a.penanggung_jawab IN ($list)";
+            }
+
+            $data = DB::select("SELECT a.*,
+                                b.nama AS nama_status_pencapaian,
+                                c.nama_pegawai,
+                                d.nama AS nama_tahun_pelajaran
+                            FROM program_kerja_tahunan a
+                            LEFT JOIN master_status_pencapaian b ON b.id=a.id_status_capaian
+                            LEFT JOIN simpia.Data_Induk_Pegawai c ON c.no_pegawai=a.penanggung_jawab
+                            LEFT JOIN litbang.master_tahun_pelajaran d ON d.id=a.id_tahun_pelajaran
+                            WHERE a.id <> ''
+                            {$Fstatus}
+                            {$Fapprove}
+                            {$Ftahun}
+                            {$Fbidang}
+                            {$Fpegawai}
+                            ORDER BY created_at ASC");
+        } else {
+            // Belum login, redirect ke login umum
+            return redirect()->route('login');
+        }
+
+        for ($i = 0; $i < count($data); $i++) {
             $id = $data[$i]->id;
-
-
         }
 
         return $data;
     }
-
 }

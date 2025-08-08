@@ -14,26 +14,24 @@
                      <h3 class="card-title">Level</h3>
                  </div>
 
-                 <div class="card-body table-responsive p-3">
-
-                     {{-- level --}}
-                     <div class="row">
-
-                         <div class="col">
-                             <button type="button" data-id=""
-                                 class="data_level btn btn-block btn-warning btn-sm">All</button>
-                         </div>
-                         
-                         @foreach ($data_level as $l)
-                             <div class="col">
-                                 <button type="button" data-id="{{ $l->id }}"
-                                     class="data_level btn btn-block btn-primary btn-sm">{{ $l->name }} :
-                                     {{ $l->jumlah }}</button>
-                             </div>
-                         @endforeach
-                     </div>
-
-                 </div>
+                <div class="card-body table-responsive p-3">
+                    {{-- level --}}
+                    <div class="row justify-content-center g-2 flex-wrap">
+                        <div class="col-auto mb-2">
+                            <button type="button" data-id=""
+                                class="data_level btn btn-warning btn-sm shadow rounded-pill px-4">All</button>
+                        </div>
+                        @foreach ($data_level as $l)
+                            <div class="col-auto mb-2">
+                                <button type="button" data-id="{{ $l->id }}"
+                                    class="data_level btn btn-primary btn-sm shadow rounded-pill px-4 d-flex align-items-center">
+                                    <span class="me-2">{{ $l->name }}</span>
+                                    <span style="margin-left:8px;" class="badge bg-light text-dark"> {{ $l->jumlah }}</span>
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
              </div>
          </div>
 
@@ -46,22 +44,24 @@
                  </div>
 
                  <!-- /.card-header -->
-                 <div class="card-body table-responsive p-3" style="height: 380px;">
-                     <table id="tabel_user" class="table table-bordered table-striped display compact table-sm">
-                         <thead>
-                             <tr>
-                                 <th>No</th>
-                                 <th>Aksi</th>
-                                 <th>Level</th>
-                                 <th>Bidang</th>
-                                 <th>Unit</th>
-                                 <th>NIP</th>
-                                 <th>Nama</th>
-                                 <th>Struktur</th>
-                             </tr>
-                         </thead>
-                     </table>
-                 </div>
+                <div class="card-body table-responsive p-3" style="min-height: 380px;">
+                    <div class="table-responsive">
+                        <table id="tabel_user" class="table table-bordered table-hover table-striped align-middle text-nowrap">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="text-center" style="width:40px;">No</th>
+                                    <th class="text-center" style="width:120px;">Aksi</th>
+                                    <th>Level</th>
+                                    <th>Bidang</th>
+                                    <th>Unit</th>
+                                    <th>NIP</th>
+                                    <th>Nama</th>
+                                    <th>Struktur</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
                  <!-- /.card-body -->
              </div>
          </div>
@@ -86,11 +86,11 @@
                      _token: '{{ csrf_token() }}'
                  }, function(e) {
                      var tabel = $("#tabel_user").DataTable({
+                         "buttons": ["excel", "pdf", "print"],
                          "responsive": true,
                          "lengthChange": false,
                          "autoWidth": false,
                          "bPaginate": false,
-                         "buttons": ["copy", "csv", "excel", "pdf", "print"],
                          "data": e,
                          "columns": [{
                                  data: 'id_pegawai',

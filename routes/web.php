@@ -48,6 +48,16 @@ use App\Http\Controllers\ReportProgramKerjaTahunanController;
 
 // data dashboard
 Route::get('/data-dashboard', [DashboardController::class, 'index'])->name('data-dashboard')->middleware('auth.web_or_admin')->middleware('cekmenuakses');
+
+// dashboard-tampil-data-absensi
+Route::post('dashboard-tampil-data-absensi', [DashboardController::class, 'dashboardTampilDataAbsensi'])->name('dashboard-tampil-data-absens')->middleware('auth.web_or_admin');
+// dashboard-tampil-data-aktivitas
+Route::post('dashboard-tampil-data-aktivitas', [DashboardController::class, 'dashboardTampilDataAktivitas'])->name('dashboard-tampil-data-aktivitas')->middleware('auth.web_or_admin');
+// dashboard-tampil-data-chart-jml-aktivitas
+Route::post('dashboard-tampil-data-chart-jml-aktivitas', [DashboardController::class, 'dashboardTampilDataChartJmlAktivitas'])->name('dashboard-tampil-data-chart-jml-aktivitas')->middleware('auth.web_or_admin');
+Route::post('chart-jml-aktivitas', [DashboardController::class, 'chartJmlAktivitas'])->name('chart-jml-aktivitas')->middleware('auth.web_or_admin');
+
+
 Route::post('load-grafik-jml-barang-operasional', [DashboardController::class, 'loadGrafikJmlBarangOperasional'])->name('load-grafik-jml-barang-operasional')->middleware('auth.web_or_admin');
 Route::get('/git-log', [GitLogController::class, 'index'])->name('git-log')->middleware('auth.web_or_admin');
 
@@ -68,6 +78,10 @@ Route::post('simpan-program-kerja-tahunan', [ProgramKerjaTahunanController::clas
 Route::post('get-data-edit-program-kerja-tahunan-by-id', [ProgramKerjaTahunanController::class, 'getDataEditProgramKerjaTahunanById']);
 Route::post('destroy-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'destroy']);
 Route::post('clone-program-kerja', [ProgramKerjaTahunanController::class, 'cloneDariTahunLalu']);
+// impor
+Route::get('/download-template-impor-program-kerja', [ProgramKerjaTahunanController::class, 'downloadTemplateImporProgramKerja'])->name('download-template-impor-program-kerja')->middleware('auth.web_or_admin');;
+Route::post('import-preview-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'importPreviewProgramKerjaTahunan'])->middleware('auth.web_or_admin');
+Route::post('proses-imports-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'prosesImportsProgramKerjaTahunan'])->middleware('auth.web_or_admin');
 
 
 // approval
@@ -83,6 +97,7 @@ Route::post('simpan-jurnal-harian', [JurnalHarianController::class, 'simpanJurna
 Route::post('get-data-edit-jurnal-harian-by-id', [JurnalHarianController::class, 'getDataEditJurnalHarianById']);
 Route::post('destroy-jurnal-harian', [JurnalHarianController::class, 'destroy']);
 
+Route::post('preview-dokumen', [JurnalHarianController::class, 'previewDokumen']);
 
 // == reporting
 
@@ -168,6 +183,7 @@ Route::post('select-jenis-kegiatan', [SelectController::class, 'getJenisKegiatan
 Route::post('select-status-capaian', [SelectController::class, 'getStatusCapaian'])->name('select-status-capaian')->middleware('auth.web_or_admin');
 Route::post('select-program-kerja-by-user', [SelectController::class, 'getProgramKerjaByUser'])->name('select-program-kerja-by-user')->middleware('auth.web_or_admin');
 Route::post('select-data-pegawai-by-so', [SelectController::class, 'dataPegawaiBySo'])->name('select-data-pegawai-by-so')->middleware('auth.web_or_admin');
+Route::post('select-user-level', [SelectController::class, 'getUserLevel'])->name('select-user-level')->middleware('auth.web_or_admin');
 
 Route::post('/select-nama-pegawai', [SelectController::class, 'namaPegawai'])->name('nama-pegawai')->middleware('auth.web_or_admin');
 Route::post('/select-nama-asset', [SelectController::class, 'namaAsset'])->name('select-nama-asset')->middleware('auth.web_or_admin');
@@ -202,6 +218,13 @@ Route::get('/user-non-civitas', [UserNonCivitasController::class, 'index'])->mid
 Route::post('load-tabel-user-non-civitas', [UserNonCivitasController::class, 'loadTabelUserNonCivitas'])->name('load-tabel-user-non-civitas');
 Route::post('store-user-non-civitas', [UserNonCivitasController::class, 'store']);
 Route::post('destroy-user-non-civitas', [UserNonCivitasController::class, 'destroy']);
+// tampil-mapping-bawahan
+Route::post('tampil-mapping-bawahan', [UserNonCivitasController::class, 'tampilMappingBawahan']);
+Route::post('tabel-mapping-bawahan', [UserNonCivitasController::class, 'tabelMappingBawahan']);
+Route::post('save-data-bawahan', [UserNonCivitasController::class, 'saveDataBawahan']);
+Route::post('hapus-data-bawahan', [UserNonCivitasController::class, 'hapusDataBawahan']);
+
+
 
 // menu header
 Route::get('/admin/menu', [MenuController::class, 'index'])->middleware('auth.web_or_admin');

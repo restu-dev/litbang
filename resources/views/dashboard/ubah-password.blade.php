@@ -8,8 +8,21 @@
                  <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
                  <div class="card-header">
-                     <h5 class="m-0">Action</h5>
+
+                     @if (Auth::guard('admin')->check())
+                         <input type="hidden" value="T" name="yt_civitas" class="form-control" id="yt_civitas">
+                         <h5>Action</h5>
+                     @elseif (Auth::guard('web')->check())
+                         <p><b>Perhatian: </b>Jika Anda mengubah kata sandi di sini, maka kata sandi untuk seluruh layanan
+                             yang menggunakan akun ESA juga akan ikut berubah.</p>
+                         <input type="hidden" value="Y" name="yt_civitas" class="form-control" id="yt_civitas">
+                     @else
+                         <p>Belum login</p>
+                     @endif
                  </div>
+
+
+
                  <div class="card-body">
 
                      <div class="card-body pl-0 pt-0">
@@ -56,13 +69,14 @@
  @section('script')
      <script>
          $(function() {
-            $('.loader').hide();
+             $('.loader').hide();
 
              //  save_form
              $(document).on("click", "#save_form", function(e) {
-                 var pass_lama          = $("#pass_lama").val();
-                 var pass_baru          = $("#pass_baru").val();
-                 var ulangi_pass_baru   = $("#ulangi_pass_baru").val();
+                 var yt_civitas = $("#yt_civitas").val();
+                 var pass_lama = $("#pass_lama").val();
+                 var pass_baru = $("#pass_baru").val();
+                 var ulangi_pass_baru = $("#ulangi_pass_baru").val();
 
                  if (pass_lama == "") {
                      tampilPesan('warning', ' Password Lama tidak boleh kosong!');
@@ -74,6 +88,8 @@
                      tampilPesan('warning', ' Gagal, Panjang karakter harus >= 6 karakter');
                  } else if (pass_baru != ulangi_pass_baru) {
                      tampilPesan('warning', ' Gagal, Password Baru tidak sama dengan Ulangi Password Baru!');
+                 } else if (yt_civitas == "Y") {
+                     tampilPesan('warning', ' Gagal!');
                  } else {
                      $.ajax({
                          url: "/simpan-ubah-password",
@@ -82,6 +98,7 @@
                          data: {
                              pass_lama,
                              pass_baru,
+                             yt_civitas,
                              _token: '{{ csrf_token() }}'
                          },
                          success: function(result) {
@@ -89,9 +106,9 @@
                              var pesan = result.pesan;
 
                              if (sukses == "Y") {
-                                  $('.loader').hide();
-                                    tampilPesan('success', pesan);
-                                    resetForm();
+                                 $('.loader').hide();
+                                 tampilPesan('success', pesan);
+                                 resetForm();
                              } else {
                                  $('.loader').hide();
                                  tampilPesan('error', result.pesan);

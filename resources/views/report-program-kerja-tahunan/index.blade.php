@@ -6,46 +6,50 @@
  @endsection
 
  @section('content')
-     <div class="row">
-         <div class="col-lg-12">
-             <div class="card">
-                 <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+                <div class="card-body">
+                    <form>
+                        <div class="row g-2">
+                            {{-- filter tahun --}}
+                            <div class="col-12 col-md-3">
+                                <select id="filter_tahun_pelajaran" class="form-control select2" style="width: 100%;">
+                                </select>
+                            </div>
 
-                 <div class="card-body card-body">
-                     <div class="row justify-content-start">
-                         {{-- filter tahun --}}
-                         <div class="col-3">
-                             <select id="filter_tahun_pelajaran" class="form-control select2" style="width: 100%;">
-                             </select>
-                         </div>
+                            @if (Auth::guard('admin')->check())
+                                {{-- filter bidang --}}
+                                {{-- <div class="col-12 col-md-3">
+                                    <select id="filter_bidang" class="form-control select2" style="width: 100%;">
+                                    </select>
+                                </div> --}}
+                            @endif
 
-                         {{-- filter bidang --}}
-                         <div class="col-3">
-                             <select id="filter_bidang" class="form-control select2" style="width: 100%;">
-                             </select>
-                         </div>
+                            {{-- filter status --}}
+                            <div class="col-12 col-md-3">
+                                <select id="filter_status_capaian" class="form-control select2" style="width: 100%;">
+                                </select>
+                            </div>
 
-                         {{-- filter status --}}
-                         <div class="col-3">
-                             <select id="filter_status_capaian" class="form-control select2" style="width: 100%;">
-                             </select>
-                         </div>
-
-                         {{-- filter approvement --}}
-                         {{-- <div class="col-3">
-                             <select id="filter_approvement" class="form-control select2" style="width: 100%;">
-                                 <option value="">-Approvement-</option>
-                                 <option value="Belum">Belum</option>
-                                 <option value="Ya">Ya</option>
-                                 <option value="Tidak">Tidak</option>
-                             </select>
-                         </div> --}}
-
-                     </div>
-                 </div>
-             </div>
-         </div>
-     </div>
+                            {{-- filter approvement --}}
+                            {{-- 
+                            <div class="col-12 col-md-3">
+                                <select id="filter_approvement" class="form-control select2" style="width: 100%;">
+                                    <option value="">-Approvement-</option>
+                                    <option value="Belum">Belum</option>
+                                    <option value="Ya">Ya</option>
+                                    <option value="Tidak">Tidak</option>
+                                </select>
+                            </div> 
+                            --}}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
      <div class="row">
          <div class="col-lg-12">
@@ -193,7 +197,7 @@
                  loadTabelData(filter_status_capaian, filter_approvement, filter_tahun, filter_bidang);
              });
 
-              // on change filter_bidang
+             // on change filter_bidang
              $('#filter_bidang').on("change", function(e) {
 
                  var filter_status_capaian = $("#filter_status_capaian").val();

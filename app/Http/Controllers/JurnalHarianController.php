@@ -97,7 +97,22 @@ class JurnalHarianController extends Controller
                       </button>
                      </div>";
 
+            $file_dokumen = $data[$i]->file_dokumen;
+            $file_foto    = $data[$i]->file_foto;
+
+            $aksi_file_dokumen="";
+            if(!empty($file_dokumen)){
+                $aksi_file_dokumen = "<span style='cursor: pointer' data-id='$id' data-jenis='dokumen' class='preview_dokumen right badge badge-primary'>📑 $file_dokumen</span>";
+            }
+
+            $aksi_file_foto="";
+            if(!empty($file_foto)){
+                $aksi_file_foto = "<span style='cursor: pointer' data-id='$id' data-jenis='foto' class='preview_dokumen right badge badge-success'>📷 $file_foto</span>";
+            }
+
             $data[$i]->aksi=$aksi;
+            $data[$i]->file_dokumen=$aksi_file_dokumen;
+            $data[$i]->file_foto=$aksi_file_foto;
         }
 
         return $data;
@@ -311,5 +326,17 @@ class JurnalHarianController extends Controller
             'status' => 'success',
             'message' => "Deleted!",
         ]);
+    }
+
+    public function previewDokumen(Request $request)
+    {
+        $id = $request->id;
+        $jenis = $request->jenis;
+        $jurnal_harian = JurnalHarian::where('id',$id)->first();
+
+        $data['jenis'] = $jenis;
+        $data['jurnal_harian'] = $jurnal_harian;
+
+         return view('jurnal-harian.preview-dokumen', ["data" => $data]);
     }
 }
