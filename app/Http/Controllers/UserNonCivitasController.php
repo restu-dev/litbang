@@ -164,6 +164,7 @@ class UserNonCivitasController extends Controller
     {
 
         if (!empty($id_user_level_bawahan)) {
+
             $bawahan = DB::table('user_level')
                 ->where('id', $id_user_level_bawahan)
                 ->first();
@@ -175,7 +176,7 @@ class UserNonCivitasController extends Controller
                 $nip = $bawahan->nip;
                 $bawahan = DB::table('simpia.Data_Induk_Pegawai')->where('NIP', $nip)->first()->nama_pegawai;
             } else {
-                $bawahan->nip = $bawahan->nip . " (Non Civitas)";
+                $bawahan = $bawahan->nip . " (Non Civitas)";
             }
 
             return $bawahan;

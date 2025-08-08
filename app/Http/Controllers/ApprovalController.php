@@ -27,9 +27,9 @@ class ApprovalController extends Controller
         $hariIni = Carbon::now()->toDateString();
 
         $tahunAjar = DB::table('master_tahun_pelajaran')
-        ->whereDate('awal', '<=', $hariIni)
-        ->whereDate('akhir', '>=', $hariIni)
-        ->first();
+            ->whereDate('awal', '<=', $hariIni)
+            ->whereDate('akhir', '>=', $hariIni)
+            ->first();
 
         $id_tahun_ajaran = $tahunAjar ? $tahunAjar->id : null;
         $nama_tahun_ajaran = $tahunAjar ? $tahunAjar->nama : null;
@@ -38,18 +38,6 @@ class ApprovalController extends Controller
         $active = 'approval';
 
         $no_pegawai   = session('no_pegawai');
-        $id_struktur  = session('id_struktur');
-
-        if(empty($id_struktur)){
-            return view('approval.index', [
-                'title' => $title,
-                'active' => $active,
-                'tahunAjar' => $tahunAjar,
-                'id_tahun_ajaran' => $id_tahun_ajaran,
-                'nama_tahun_ajaran' => $nama_tahun_ajaran,
-                'ada_struktur' => "T"
-            ]);
-        }
 
         if (Auth::guard('admin')->check()) {
             //    noncivitas
@@ -97,12 +85,31 @@ class ApprovalController extends Controller
 
         $nama_level = session('nama_level');
 
-        if($nama_level=='Ketua Harian' || $nama_level=='Kepala Biro'){
-            $penanggung = session('no_pegawai');
+        // level ini bisa approve dirisendiri dan bawahan jika di mapping bawahan ada
+        if ($nama_level == 'Ketua Harian' || $nama_level == 'Kepala Biro') {
 
-            $data_pegawai = "AND penanggung_jawab = '$penanggung'";
+            // bedakan user civitas dan non civitas
+            // Jika user civitas hanya bisa approve dirisendiri
+            // Jika user non civitas bisa approve dirisendiri dan bawahan -> ambil dari tabel mapping bawahan
 
-        }else{
+            if (Auth::guard('admin')->check()) {
+                // noncivitas
+                $nip = session('nip');
+
+                $penanggung = $this->helper->listPegawaiMappingBawahan($nip);
+
+                $list = "'" . implode("','", $penanggung) . "'";
+
+                $data_pegawai = "AND penanggung_jawab IN ($list)";
+            } else {
+                // civitas
+                $no_pegawai = session('no_pegawai');
+
+                $data_pegawai = "AND penanggung_jawab='$no_pegawai'";
+            }
+        } else {
+            // civitas yg level nya bukan Ketua Harian dan Kepala Biro
+
             $id_struktur = session('id_struktur');
             // $id_struktur = '525';
             $penanggung = $this->helper->listPegawai($id_struktur);
@@ -112,7 +119,7 @@ class ApprovalController extends Controller
             $data_pegawai = "AND penanggung_jawab IN ($list)";
         }
 
-        
+
         $data = DB::select("SELECT a.*,
                                 b.nama AS nama_status_pencapaian,
                                 c.nama_pegawai,
@@ -136,27 +143,29 @@ class ApprovalController extends Controller
 
             $data[$i]->pro_capaian = $pro_capaian . ' %';
 
-            if($approvement=="Ya"){
-                    $aksi = "<div class='btn-group'>
+            $data[$i]->nama_pegawai = $data[$i]->nama_pegawai??$data[$i]->penanggung_jawab.'(Non Civitas)';
+
+            if ($approvement == "Ya") {
+                $aksi = "<div class='btn-group'>
                       <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-success btn-sm add_edit_data'>
                        <i class='fas fa-check'></i>
                       </button>
                     </div>";
-            }else if($approvement=="Tidak"){
-                    $aksi = "<div class='btn-group'>
+            } else if ($approvement == "Tidak") {
+                $aksi = "<div class='btn-group'>
                       <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-danger btn-sm add_edit_data'>
                        <i class='fas fa-close'></i>
                       </button>
                     </div>";
-            }else{
-                    $aksi = "<div class='btn-group'>
+            } else {
+                $aksi = "<div class='btn-group'>
                       <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-warning btn-sm add_edit_data'>
                        <i class='fas fa-edit'></i>
                       </button>
                     </div>";
             }
 
-          
+
 
             $data[$i]->aksi = $aksi;
         }
@@ -186,6 +195,4 @@ class ApprovalController extends Controller
 
         return $hasil;
     }
-
-   
 }

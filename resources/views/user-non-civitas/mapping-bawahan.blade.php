@@ -55,6 +55,7 @@
         }
 
         // load tabel user wifi
+        /*
         function loadData() {
             var id_user_level = $("#id_user_level").val();
 
@@ -106,18 +107,73 @@
                 $('.loader').hide();
             });
         }
+        */
 
+        function loadData() {
+            var id_user_level = $("#id_user_level").val();
+            $('.loader').show();
+
+            // Cek & destroy kalau DataTable sudah ada
+            if ($.fn.DataTable.isDataTable('#table_maping')) {
+                $('#table_maping').DataTable().clear().destroy();
+            }
+
+            $.post('{{ URL::to('tabel-mapping-bawahan') }}', {
+                id_user_level,
+                _token: '{{ csrf_token() }}'
+            }, function(e) {
+
+                var tabel = $("#table_maping").DataTable({
+                    "responsive": true,
+                    "lengthChange": false,
+                    "autoWidth": false,
+                    "searching": false,
+                    "data": e,
+                    "columns": [{
+                            data: 'id',
+                            render: function(data, type, row, meta) {
+                                return meta.row + 1;
+                            },
+                            className: "text-center",
+                        },
+                        {
+                            data: 'bawahan',
+                            className: "text-left",
+                        },
+                        {
+                            data: 'aksi',
+                            className: "text-left",
+                        },
+                    ]
+                });
+
+                // Nomor urut ulang jika sorting/filter
+                tabel.on('order.dt search.dt', function() {
+                    tabel.column(0, {
+                        search: 'applied',
+                        order: 'applied'
+                    }).nodes().each(function(cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                });
+
+            }).done(function(data) {
+                $('.loader').hide();
+            });
+        }
+
+        /*
         //  save add
         $(document).on("click", "#save_form_bawahan", function(e) {
-            
+
             e.preventDefault(); // cegah reload form default
 
             var id_user_level = $("#id_user_level").val();
             var id_user_level_bawahan = $("#user_level").val();
 
-            if (id_user_level == "") {  
+            if (id_user_level == "") {
                 tampilPesan('warning', ' Atasan tidak boleh kosong!');
-            } else if(id_user_level_bawahan == ""){
+            } else if (id_user_level_bawahan == "") {
                 tampilPesan('warning', ' Bawahan tidak boleh kosong!');
             } else {
 
@@ -151,10 +207,56 @@
                         tampilPesan('error', 'request failed');
                     }
                 });
-            
+
             }
 
         });
+        */
+
+        $(document).ready(function() {
+            // Pastikan hanya bind sekali
+            $(document).off("click", "#save_form_bawahan").on("click", "#save_form_bawahan", function(
+            e) {
+                e.preventDefault(); // cegah reload form default
+
+                var id_user_level = $("#id_user_level").val();
+                var id_user_level_bawahan = $("#user_level").val();
+
+                if (id_user_level == "") {
+                    tampilPesan('warning', 'Atasan tidak boleh kosong!');
+                } else if (id_user_level_bawahan == "") {
+                    tampilPesan('warning', 'Bawahan tidak boleh kosong!');
+                } else {
+                    $.ajax({
+                        url: "/save-data-bawahan",
+                        cache: false,
+                        type: 'post',
+                        data: {
+                            id_user_level,
+                            id_user_level_bawahan,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(result) {
+                            var sukses = result.sukses;
+                            var status = result.status;
+                            var message = result.message;
+
+                            if (sukses == 'Y') {
+                                loadUserLevel();
+                                loadData();
+                                tampilPesan(status, message);
+                            } else {
+                                tampilPesan(status, message);
+                            }
+                        },
+                        error: function(xhr, textStatus, errorThrown) {
+                            tampilPesan('error', 'Request gagal');
+                        }
+                    });
+                }
+            });
+        });
+
 
         $(document).on("click", ".hapus_data_bawahan", function(e) {
             var id = $(this).data("id");

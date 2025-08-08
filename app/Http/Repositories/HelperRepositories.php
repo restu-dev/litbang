@@ -248,6 +248,53 @@ class HelperRepositories
 
         return $no_pegawai;
     }
+
+     // list bawahan user non civitas
+    public function listPegawaiMappingBawahan($nip)
+    {
+        // get id dari user_level by nip
+        $id_user_level = DB::table('user_level')->where('nip',$nip)->first()->id;
+       
+        $results = DB::select("SELECT *, a.id AS id_mapping_bawahan_non_civitas
+                                FROM mapping_bawahan_non_civitas a
+                                LEFT JOIN user_level b ON a.id_user_level=b.id
+                                WHERE b.id='$id_user_level'");
+
+        $no_pegawai = [];
+        
+        for($i=0;$i<count($results);$i++){
+            // $no_pegawai[] = $results[$i]->no_pegawai;
+            $nip_bawahan = $results[$i]->nip;
+            $id_user_level_bawahan = $results[$i]->id_user_level_bawahan;
+
+            $user_level = DB::table('user_level')->where('id',$id_user_level_bawahan)->first();
+            // cek bawahan civitas atau bukan
+            // jika civitas cari no_pegawai by nip
+            // jika bukan no_pegawai = nip
+
+            $nip_bawahan = $user_level->nip;
+
+            $yt_civitas = $user_level->yt_civitas;
+
+            if($yt_civitas=="Y"){
+
+                $data_pegawai = DB::table('simpia.Data_Induk_Pegawai')
+                                ->where('NIP', $nip_bawahan) 
+                                ->selectRaw('CAST(no_pegawai AS UNSIGNED) AS no_pegawai')
+                                ->orderByDesc(DB::raw('CAST(no_pegawai AS UNSIGNED)'))
+                                ->limit(1)
+                                ->value('no_pegawai');
+
+                $no_pegawai[] = $data_pegawai;
+                
+            }else{
+                $no_pegawai[] = $user_level->nip;
+            }
+
+        }
+
+        return $no_pegawai;
+    }
   
 
 }

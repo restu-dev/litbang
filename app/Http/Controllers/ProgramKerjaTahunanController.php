@@ -338,11 +338,20 @@ class ProgramKerjaTahunanController extends Controller
 
         $data = ProgramKerjaTahunan::where('id', $id)->first();
         $no_pegawai = $data->penanggung_jawab;
-        $nama_pegawai = DB::table('simpia.Data_Induk_Pegawai')->where('no_pegawai', $no_pegawai)->first()->nama_pegawai;
+        $nama_pegawai = DB::table('simpia.Data_Induk_Pegawai')->where('no_pegawai', $no_pegawai)->first()->nama_pegawai??"";
+
+        if(!empty($nama_pegawai)){
+            $nama_pegawai = $nama_pegawai;
+        }else{
+            $nama_pegawai = $no_pegawai;
+        }
 
         $data['id_tahun_pelajaran'] = $data->id_tahun_pelajaran;
         $data['program_kerja'] = $data->program_kerja;
         $data['penanggung_jawab'] = $data->penanggung_jawab;
+
+        // 
+
         $data['nama_penanggung_jawab'] = $nama_pegawai;
         $data['target_frekuensi_tahunan'] = $data->target_frekuensi_tahunan;
         $data['indikator_kinerja'] = $data->indikator_kinerja;
