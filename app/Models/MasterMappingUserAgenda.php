@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MasterStatusPencapaian extends Model
+class MasterMappingUserAgenda extends Model
 {
     // Table
-    protected $table =  'litbang.master_status_pencapaian';
+    protected $table =  'litbang.mapping_user_agenda';
 
     protected $guarded = ['id'];
 }

@@ -30,6 +30,7 @@ use App\Http\Controllers\MasterJenisKegiatanController;
 use App\Http\Controllers\ProgramKerjaTahunanController;
 use App\Http\Controllers\MasterTahunPelajaranController;
 use App\Http\Controllers\MasterStatusPencapaianController;
+use App\Http\Controllers\MasterMappingUserAgendaController;
 use App\Http\Controllers\ReportProgramKerjaTahunanController;
 
 
@@ -151,6 +152,13 @@ Route::get('/master-status-pencapaian', [MasterStatusPencapaianController::class
 Route::post('load-tabel-master-status-pencapaian', [MasterStatusPencapaianController::class, 'loadTabelMasterStatusPencapaian'])->name('load-tabel-master-status-pencapaian');
 Route::post('store-master-status-pencapaian', [MasterStatusPencapaianController::class, 'store']);
 Route::post('destroy-master-status-pencapaian', [MasterStatusPencapaianController::class, 'destroy']);
+
+// master-mapping-user-agenda
+Route::get('/master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'index'])->middleware('auth.web_or_admin');
+Route::post('load-tabel-master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'loadTabelMasterMappingUserAgenda'])->name('load-tabel-master-mapping-user-agenda');
+Route::post('store-master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'store']);
+Route::post('destroy-master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'destroy']);
+
 
 // master keterangan
 Route::get('/keterangan', [KeteranganController::class, 'index'])->name('keterangan')->middleware('auth.web_or_admin');
