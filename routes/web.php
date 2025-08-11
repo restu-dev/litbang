@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AksesController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\GitLogController;
 use App\Http\Controllers\SelectController;
 use App\Http\Controllers\ApprovalController;
@@ -98,6 +99,17 @@ Route::post('get-data-edit-jurnal-harian-by-id', [JurnalHarianController::class,
 Route::post('destroy-jurnal-harian', [JurnalHarianController::class, 'destroy']);
 
 Route::post('preview-dokumen', [JurnalHarianController::class, 'previewDokumen']);
+
+// == agenda
+
+// agenda
+Route::get('/agenda', [AgendaController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/agenda-events', [AgendaController::class, 'events'])->middleware('auth.web_or_admin');
+Route::post('/agenda/store', [AgendaController::class, 'store'])->middleware('auth.web_or_admin');
+Route::get('/agenda/{id}', [AgendaController::class, 'show'])->middleware('auth.web_or_admin');
+Route::post('/agenda/update/{id}', [AgendaController::class, 'update'])->middleware('auth.web_or_admin');
+Route::post('/agenda/delete/{id}', [AgendaController::class, 'destroy'])->middleware('auth.web_or_admin');
+
 
 // == reporting
 

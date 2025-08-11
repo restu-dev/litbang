@@ -343,7 +343,7 @@
                      success: function(result) {
 
                          $("#modal-lg-bawahan").modal("show");
-                         $(".modal-title-bawahan").html('Mapping Bawahan');
+                         $(".modal-title-bawahan").html('Mapping Approval');
 
                          console.log(result);
 

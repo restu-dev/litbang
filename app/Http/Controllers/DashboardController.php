@@ -95,6 +95,7 @@ class DashboardController extends Controller
         $no_pegawai   = session('no_pegawai');
         $id_struktur  = session('id_struktur');
 
+        /*
         // bedakan user civitas dan non civitas
         if (Auth::guard('admin')->check()) {
             //    noncivitas
@@ -206,6 +207,86 @@ class DashboardController extends Controller
             // Belum login, redirect ke login umum
             return redirect()->route('login');
         }
+        */
+
+        //  ----- update reques terbaru -------
+
+        $nama_level = session('nama_level');
+
+        // level ini bisa lihat dirisendiri dan bawahan jika di mapping bawahan ada
+        if ($nama_level == 'Ketua Harian' || $nama_level == 'Kepala Biro') {
+
+            // bedakan user civitas dan non civitas
+            // Jika user civitas hanya bisa lihat dirisendiri /bawahan jika ada
+            // Jika user non civitas bisa lihat dirisendiri dan bawahan -> ambil dari tabel mapping bawahan
+
+            if (Auth::guard('admin')->check()) {
+                // noncivitas
+                $nip = session('nip');
+
+                $penanggung = $this->helper->listPegawaiMappingBawahan($nip);
+
+                $list = "'" . implode("','", $penanggung) . "'";
+
+                $Fpegawai = "AND a.penanggung_jawab IN ($list)";
+            } else {
+                // civitas
+                $ada_struktur = $this->helper->cekStrukturOrganisasi($no_pegawai);
+
+                if ($ada_struktur == 'T') {
+                    $Fpegawai = "AND a.penanggung_jawab='$no_pegawai'";
+                } else {
+                    $penanggung = $this->helper->listPegawai($id_struktur);
+
+                    $list = "'" . implode("','", $penanggung) . "'";
+
+                    $Fpegawai = "AND a.penanggung_jawab IN ($list)";
+                }
+            }
+        } else {
+            // civitas yg level nya bukan Ketua Harian dan Kepala Biro
+
+            $id_struktur = session('id_struktur');
+            // $id_struktur = '525';
+            $penanggung = $this->helper->listPegawai($id_struktur);
+
+            $list = "'" . implode("','", $penanggung) . "'";
+
+            $Fpegawai = "AND a.penanggung_jawab IN ($list)";
+        }
+
+        $data = DB::select("SELECT a.*,
+                                b.nama AS nama_status_pencapaian,
+                                c.nama_pegawai,
+                                d.nama AS nama_bidang,
+                                e.nama AS nama_jenis_kegiatan,
+                                f.program_kerja AS nama_program_kerja,
+                                f.id_tahun_pelajaran,
+                                h.nama AS nama_tahun_pelajaran
+                            FROM jurnal_harian a
+                            LEFT JOIN master_status_pencapaian b ON b.id = a.id_status_pencapaian
+                            LEFT JOIN simpia.Data_Induk_Pegawai c ON c.no_pegawai = a.penanggung_jawab
+                            LEFT JOIN master_bidang d ON d.id = a.id_bidang
+                            LEFT JOIN master_jenis_kegiatan e ON e.id = a.id_jenis_kegiatan
+                            LEFT JOIN program_kerja_tahunan f ON f.id = a.id_program_kerja_tahunan
+                            LEFT JOIN litbang.master_tahun_pelajaran h ON h.id = a.id_tahun_pelajaran
+                            INNER JOIN (
+                                SELECT penanggung_jawab,
+                                    MAX(GREATEST(
+                                        IFNULL(updated_at, '0000-00-00 00:00:00'),
+                                        IFNULL(created_at, '0000-00-00 00:00:00')
+                                    )) AS waktu_terakhir
+                                FROM jurnal_harian
+                                GROUP BY penanggung_jawab
+                            ) AS last_aktivitas
+                            ON a.penanggung_jawab = last_aktivitas.penanggung_jawab
+                            AND GREATEST(
+                                IFNULL(a.updated_at, '0000-00-00 00:00:00'),
+                                IFNULL(a.created_at, '0000-00-00 00:00:00')
+                            ) = last_aktivitas.waktu_terakhir
+                            {$Fpegawai}
+                            ORDER BY c.nama_pegawai ASC");
+
 
         return view('dashboard.partials.tampil_data_aktivitas', compact('data'));
     }
@@ -330,6 +411,51 @@ class DashboardController extends Controller
             return $no_pegawai;
         }
 
+        function listPegawaiMappingBawahan($nip)
+        {
+            // get id dari user_level by nip
+            $id_user_level = DB::table('user_level')->where('nip', $nip)->first()->id;
+
+            $results = DB::select("SELECT *, a.id AS id_mapping_bawahan_non_civitas
+                                FROM mapping_bawahan_non_civitas a
+                                LEFT JOIN user_level b ON a.id_user_level=b.id
+                                WHERE b.id='$id_user_level'");
+
+            $no_pegawai = [];
+
+            for ($i = 0; $i < count($results); $i++) {
+                // $no_pegawai[] = $results[$i]->no_pegawai;
+                $nip_bawahan = $results[$i]->nip;
+                $id_user_level_bawahan = $results[$i]->id_user_level_bawahan;
+
+                $user_level = DB::table('user_level')->where('id', $id_user_level_bawahan)->first();
+                // cek bawahan civitas atau bukan
+                // jika civitas cari no_pegawai by nip
+                // jika bukan no_pegawai = nip
+
+                $nip_bawahan = $user_level->nip;
+
+                $yt_civitas = $user_level->yt_civitas;
+
+                if ($yt_civitas == "Y") {
+
+                    $data_pegawai = DB::table('simpia.Data_Induk_Pegawai')
+                        ->where('NIP', $nip_bawahan)
+                        ->selectRaw('CAST(no_pegawai AS UNSIGNED) AS no_pegawai')
+                        ->orderByDesc(DB::raw('CAST(no_pegawai AS UNSIGNED)'))
+                        ->limit(1)
+                        ->value('no_pegawai');
+
+                    $no_pegawai[] = $data_pegawai;
+                } else {
+                    $no_pegawai[] = $user_level->nip;
+                }
+            }
+
+            return $no_pegawai;
+        }
+
+
         function loadTabelReportJurnalHarian($bulan, $status, $filter_tahun, $filter_ada_tidak_program_kerja, $filter_jenis_kegiatan, $filter_status_pencapaian, $filter_bidang)
         {
             // $no_pegawai = '20000497';
@@ -384,6 +510,7 @@ class DashboardController extends Controller
                 $Fbidang = "AND a.id_bidang='$filter_bidang'";
             }
 
+            /*
             // bedakan user civitas dan non civitas
             if (Auth::guard('admin')->check()) {
                 //    noncivitas
@@ -451,6 +578,71 @@ class DashboardController extends Controller
                 // Belum login, redirect ke login umum
                 return redirect()->route('login');
             }
+            */
+
+
+            $nama_level = session('nama_level');
+
+            // level ini bisa lihat dirisendiri dan bawahan jika di mapping bawahan ada
+            if ($nama_level == 'Ketua Harian' || $nama_level == 'Kepala Biro') {
+
+                // bedakan user civitas dan non civitas
+                // Jika user civitas hanya bisa lihat dirisendiri /bawahan jika ada
+                // Jika user non civitas bisa lihat dirisendiri dan bawahan -> ambil dari tabel mapping bawahan
+
+                if (Auth::guard('admin')->check()) {
+                    // noncivitas
+                    $nip = session('nip');
+
+                    $penanggung = listPegawaiMappingBawahan($nip);
+
+                    $list = "'" . implode("','", $penanggung) . "'";
+
+                    $Fpegawai = "AND a.penanggung_jawab IN ($list)";
+                } else {
+                    // civitas
+                    $ada_struktur = cekStrukturOrganisasi($no_pegawai);
+
+                    if ($ada_struktur == 'T') {
+                        $Fpegawai = "AND a.penanggung_jawab='$no_pegawai'";
+                    } else {
+                        $penanggung = listPegawai($id_struktur);
+
+                        $list = "'" . implode("','", $penanggung) . "'";
+
+                        $Fpegawai = "AND a.penanggung_jawab IN ($list)";
+                    }
+                }
+            } else {
+                // civitas yg level nya bukan Ketua Harian dan Kepala Biro
+
+                $id_struktur = session('id_struktur');
+                // $id_struktur = '525';
+                $penanggung = listPegawai($id_struktur);
+
+                $list = "'" . implode("','", $penanggung) . "'";
+
+                $Fpegawai = "AND a.penanggung_jawab IN ($list)";
+            }
+
+            $data = DB::select("SELECT count(a.id) AS jml
+                            FROM jurnal_harian a
+                            LEFT JOIN master_status_pencapaian b ON b.id=a.id_status_pencapaian
+                            LEFT JOIN simpia.Data_Induk_Pegawai c ON c.no_pegawai=a.penanggung_jawab
+                            LEFT JOIN master_bidang d ON d.id=a.id_bidang
+                            LEFT JOIN master_jenis_kegiatan e ON e.id=a.id_jenis_kegiatan
+                            LEFT JOIN program_kerja_tahunan f ON f.id=a.id_program_kerja_tahunan
+                            LEFT JOIN simpia.Data_Induk_Pegawai g ON g.no_pegawai=a.penanggung_jawab
+                            LEFT JOIN litbang.master_tahun_pelajaran h ON h.id=a.id_tahun_pelajaran
+                            WHERE a.id <> ''
+                            {$Fjenis}
+                            {$Fprogram}
+                            {$Fstatus}
+                            {$Fbidang}
+                            {$Ftgl}
+                            {$Fadaprogram}
+                            {$Fpegawai}
+                            ORDER BY a.created_at ASC");
 
             return $data[0]->jml ?? "0";
         }
