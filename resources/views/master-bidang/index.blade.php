@@ -17,6 +17,7 @@
                              <tr>
                                  <th>No</th>
                                  <th>Nama</th>
+                                 <th>Warna</th>
                                  <th>Aksi</th>
                              </tr>
                          </thead>
@@ -45,6 +46,36 @@
                              <input type="text" name="nama_master" class="form-control" id="nama_master"
                                  placeholder="Nama Master">
                          </div>
+
+                         {{-- warna --}}
+                         <div class="form-group">
+                             <label for="warna">Pilih Warna: <code>*</code></label>
+
+                             <select id="warna" name="warna" class="form-control" style="padding:5px;">
+                                 <option value="">-- Pilih Warna --</option>
+                                 <option value="#FF0000" style="background-color:#FF0000; color:white;">Merah</option>
+                                 <option value="#0000FF" style="background-color:#0000FF; color:white;">Biru</option>
+                                 <option value="#00FF00" style="background-color:#00FF00;">Hijau</option>
+                                 <option value="#FFFF00" style="background-color:#FFFF00;">Kuning</option>
+                                 <option value="#000000" style="background-color:#000000; color:white;">Hitam</option>
+                                 <option value="#FFFFFF" style="background-color:#FFFFFF;">Putih</option>
+                                 <option value="#FFA500" style="background-color:#FFA500;">Oranye</option>
+                                 <option value="#800080" style="background-color:#800080; color:white;">Ungu</option>
+                                 <option value="#FFC0CB" style="background-color:#FFC0CB;">Pink</option>
+                                 <option value="#A52A2A" style="background-color:#A52A2A; color:white;">Coklat</option>
+                                 <option value="#808080" style="background-color:#808080; color:white;">Abu-Abu</option>
+                                 <option value="#008080" style="background-color:#008080; color:white;">Teal</option>
+                                 <option value="#FFD700" style="background-color:#FFD700;">Emas</option>
+                                 <option value="#C0C0C0" style="background-color:#C0C0C0;">Perak</option>
+                                 <option value="#00FFFF" style="background-color:#00FFFF;">Cyan</option>
+                                 <option value="#4B0082" style="background-color:#4B0082; color:white;">Indigo</option>
+                                 <option value="#FF6347" style="background-color:#FF6347;">Tomato</option>
+                                 <option value="#2E8B57" style="background-color:#2E8B57; color:white;">Sea Green</option>
+                                 <option value="#DC143C" style="background-color:#DC143C; color:white;">Crimson</option>
+                                 <option value="#F5DEB3" style="background-color:#F5DEB3;">Wheat</option>
+                             </select>
+                         </div>
+
                      </div>
 
                      <div class="card-footer">
@@ -94,6 +125,10 @@
                                  data: 'nama',
                                  className: "text-left",
                              },
+                              {
+                                 data: 'tampil_warna',
+                                 className: "text-left",
+                             },
                              {
                                  data: 'aksi',
                                  className: "text-left",
@@ -120,18 +155,23 @@
              $(document).on("click", ".edit_master", function(e) {
                  var id = $(this).data("id");
                  var nama = $(this).data("nama");
+                 var warna = $(this).data("warna");
 
                  $("#id_master").val(id);
                  $("#nama_master").val(nama);
+                 $("#warna").val(warna);
              });
 
              //  save_form
              $(document).on("click", "#save_form", function(e) {
                  var id_master = $("#id_master").val();
                  var nama_master = $("#nama_master").val();
+                 var warna = $("#warna").val();
 
                  if (nama_master == "") {
                      tampilPesan('warning', ' Nama Master tidak boleh kosong!');
+                 } else if (warna == "") {
+                     tampilPesan('warning', ' Warna tidak boleh kosong!');
                  } else {
                      $.ajax({
                          url: "/store-master-bidang",
@@ -140,6 +180,7 @@
                          data: {
                              id_master,
                              nama_master,
+                             warna,
                              _token: '{{ csrf_token() }}'
                          },
                          success: function(result) {

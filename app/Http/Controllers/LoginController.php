@@ -306,8 +306,6 @@ class LoginController extends Controller
             }else{
                 $cek = ['nip' => $user_final, 'password' => $request->password];
 
-                // dd(Auth::guard('admin')->attempt($cek));
-
                 if (Auth::guard('admin')->attempt($cek)) {
                     $request->session()->regenerate();
                     $nama_level = Level::where('id', $level)->first()->name;

@@ -44,14 +44,14 @@ class MasterMappingUserAgendaController extends Controller
     {
         $data = MasterMappingUserAgenda::get();
 
-        for($i=0;$i<count($data);$i++){
+        for ($i = 0; $i < count($data); $i++) {
             $id = $data[$i]->id;
             $id_user_level = $data[$i]->id_user_level;
             $jenis = $data[$i]->jenis;
 
             $nama = $this->getUserByIdlevel($id_user_level);
 
-            $data[$i]->nama=$nama;
+            $data[$i]->nama = $nama;
 
             $aksi = "<div class='btn-group'>
 
@@ -65,7 +65,7 @@ class MasterMappingUserAgendaController extends Controller
 
                      </div>";
 
-            $data[$i]->aksi=$aksi;
+            $data[$i]->aksi = $aksi;
         }
 
         return $data;
@@ -80,26 +80,28 @@ class MasterMappingUserAgendaController extends Controller
         ];
 
         // cek sudah ada user
-        $cek = MasterMappingUserAgenda::where('id_user_level',$request->nama_master)->count();
+        $cek = MasterMappingUserAgenda::where('id_user_level', $request->nama_master)->count();
 
-        if($cek>0){
-            return response()->json([
-                'success' => 'T',
-                'status' => 'warning',
-                'message' => "User sudah ada!",
-            ]);
+        if ($cek > 0) {
+            if ($request->id_master == NULL) {
+                return response()->json([
+                    'success' => 'T',
+                    'status' => 'warning',
+                    'message' => "User sudah ada!",
+                ]);
+            }
         }
 
         $nama_pegawai = session('no_pegawai');
-        
-        if($request->id_master==NULL){
+
+        if ($request->id_master == NULL) {
             // insert
 
             $data['user_created'] = $nama_pegawai;
             $data['created_at'] = date('Y-m-d H:i:s');
 
             DB::table('mapping_user_agenda')->insert($data);
-        }else{
+        } else {
             // update
 
             $data['user_updated'] = $nama_pegawai;
@@ -138,6 +140,5 @@ class MasterMappingUserAgendaController extends Controller
 
             return $hasil;
         }
-       
     }
 }

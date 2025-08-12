@@ -24,9 +24,18 @@ class MasterBidangController extends Controller
         for($i=0;$i<count($data);$i++){
             $id = $data[$i]->id;
             $nama = $data[$i]->nama;
+            $warna = $data[$i]->warna;
+
+            if($warna==""){
+                $tampil_warna = "-";
+            }else{
+                $tampil_warna = "<div style='width:20px; height:20px; background-color:$warna; border:1px solid #000;'></div>";
+            }
+
+            $data[$i]->tampil_warna=$tampil_warna;
 
             $aksi = "<div class='btn-group'>
-                      <button data-id='$id' data-nama='$nama' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm edit_master'>
+                      <button data-id='$id' data-nama='$nama' data-warna='$warna' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm edit_master'>
                        <i class='fas fa-edit'></i>
                       </button>
                       <button data-id='$id' data-toggle='tooltip' data-placement='top' title='Delete' class='btn btn-danger btn-sm hapus_master'>
@@ -45,6 +54,7 @@ class MasterBidangController extends Controller
 
         $data = [
             'nama' => $request->nama_master,
+            'warna' => $request->warna,
         ];
 
         $nama_pegawai = session('no_pegawai');
