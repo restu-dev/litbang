@@ -26,36 +26,39 @@
              </div>
          </div>
 
-         <div class="col-lg-4">
-             <div class="card">
-                 <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+         @if (session('yt_add') == 'Y')
+             <div class="col-lg-4">
+                 <div class="card">
+                     <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
-                 <div class="card-header">
-                     <h5 class="m-0">Action</h5>
-                 </div>
-                 <div class="card-body">
+                     <div class="card-header">
+                         <h5 class="m-0">Action</h5>
+                     </div>
+                     <div class="card-body">
 
-                     <div class="card-body pl-0 pt-0">
-                         <input type="hidden" name="id_master" class="form-control" id="id_master">
+                         <div class="card-body pl-0 pt-0">
+                             <input type="hidden" name="id_master" class="form-control" id="id_master">
 
-                         {{-- nama_master --}}
-                         <div class="form-group">
-                             <label for="nama_master">Nama Master <code>*</code></label>
+                             {{-- nama_master --}}
+                             <div class="form-group">
+                                 <label for="nama_master">Nama Master <code>*</code></label>
 
-                             <input type="text" name="nama_master" class="form-control" id="nama_master"
-                                 placeholder="Nama Master">
+                                 <input type="text" name="nama_master" class="form-control" id="nama_master"
+                                     placeholder="Nama Master">
+                             </div>
                          </div>
+
+                         <div class="card-footer">
+                             <button id="reset_form" class="btn btn-warning"><i class="fas fa-refresh"></i> Reset</button>
+                             <button id="save_form" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+                         </div>
+
+
                      </div>
-
-                     <div class="card-footer">
-                         <button id="reset_form" class="btn btn-warning"><i class="fas fa-refresh"></i> Reset</button>
-                         <button id="save_form" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
-                     </div>
-
-
                  </div>
              </div>
-         </div>
+         @endif
+
 
      </div>
  @endsection
@@ -64,7 +67,7 @@
      <script>
          $(function() {
 
-              loadTabeMaster();
+             loadTabeMaster();
 
              // load tabel unit
              function loadTabeMaster() {
@@ -76,8 +79,10 @@
                      _token: '{{ csrf_token() }}'
                  }, function(e) {
                      var tabel = $("#tabel_master").DataTable({
-                         "buttons": ["excel", "pdf", "print"],
-                          "autoWidth": false,
+                         @if (session('yt_print') == 'Y')
+                             "buttons": ["excel", "pdf", "print"],
+                         @endif
+                         "autoWidth": false,
                          "searching": true,
                          "paging": false,
                          "fixedColumns": true,
@@ -98,7 +103,7 @@
                                  data: 'aksi',
                                  className: "text-left",
                              },
-                            
+
                          ]
                      }).buttons().container().appendTo('#tabel_master_wrapper .col-md-6:eq(0)');
 

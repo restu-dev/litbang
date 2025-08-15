@@ -21,48 +21,48 @@
                              </select>
                          </div>
 
-                        {{-- filter bulan --}}
-                        <div class="col-3">
-                            <select id="filter_bulan" class="form-control select2" style="width: 100%;">
-                                <option selected="selected" value="">-Bulan-</option>
-                                <?php
-                                    $today = date('d M Y');
-                                    $bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-                                    
-                                    $month = date('n');
-                                    for ($j = 1; $j <= 12; $j++) {
-                                        if ($month == $j) {
-                                            echo '<option selected="selected" value='.$j .'>' .$bulan[$j] .'</option>';
-                                        } else {
-                                            echo '<option value='.$j .'>'.$bulan[$j].'</option>';
-                                        }
-                                    }
-                                ?>
-                            </select>
-                        </div>
+                         {{-- filter bulan --}}
+                         <div class="col-3">
+                             <select id="filter_bulan" class="form-control select2" style="width: 100%;">
+                                 <option selected="selected" value="">-Bulan-</option>
+                                 <?php
+                                 $today = date('d M Y');
+                                 $bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                                 
+                                 $month = date('n');
+                                 for ($j = 1; $j <= 12; $j++) {
+                                     if ($month == $j) {
+                                         echo '<option selected="selected" value=' . $j . '>' . $bulan[$j] . '</option>';
+                                     } else {
+                                         echo '<option value=' . $j . '>' . $bulan[$j] . '</option>';
+                                     }
+                                 }
+                                 ?>
+                             </select>
+                         </div>
 
-                        {{-- filter tahun --}}
-                        <div class="col-3">
-                            <select id="filter_tahun" class="form-control select2" style="width: 100%;">
-                            <option selected="selected" value="">-Tahun-</option>
-                                <?php
-                                    $tahun = date('Y');
-                                    $start = $tahun - 4;
-                                    $i = 1;
-                                    $year = date('Y');
-                                
-                                    for ($i = 1; $i <= 5; $i++) {
-                                        if ($year == $start) {
-                                            echo '<option selected="selected" value='.$start.'>'.$start .'</option>';
-                                        } else {
-                                            echo '<option value='.$start.'>'.$start.'</option>';
-                                        }
-                                    
-                                        $start++;
-                                    }
-                                ?>
-                            </select>
-                        </div>
+                         {{-- filter tahun --}}
+                         <div class="col-3">
+                             <select id="filter_tahun" class="form-control select2" style="width: 100%;">
+                                 <option selected="selected" value="">-Tahun-</option>
+                                 <?php
+                                 $tahun = date('Y');
+                                 $start = $tahun - 4;
+                                 $i = 1;
+                                 $year = date('Y');
+                                 
+                                 for ($i = 1; $i <= 5; $i++) {
+                                     if ($year == $start) {
+                                         echo '<option selected="selected" value=' . $start . '>' . $start . '</option>';
+                                     } else {
+                                         echo '<option value=' . $start . '>' . $start . '</option>';
+                                     }
+                                 
+                                     $start++;
+                                 }
+                                 ?>
+                             </select>
+                         </div>
 
                      </div>
                  </div>
@@ -81,24 +81,24 @@
 
                  <div class="card-body">
                      <table id="tabel_master" class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th rowspan=2>Tanggal</th>
-                                <th rowspan=2>Hari</th>
-                                <th colspan=2>Absen Harian</th>
-                                <th colspan=2>Jam Kerja</th>
-                                <th colspan=2>Lebih/Kurang</th>
-                            </tr>
+                         <thead>
+                             <tr>
+                                 <th rowspan=2>Tanggal</th>
+                                 <th rowspan=2>Hari</th>
+                                 <th colspan=2>Absen Harian</th>
+                                 <th colspan=2>Jam Kerja</th>
+                                 <th colspan=2>Lebih/Kurang</th>
+                             </tr>
 
-                            <tr>
-                                <th>Masuk</th>
-                                <th>Pulang</th>
-                                <th>Masuk</th>
-                                <th>Pulang</th>
-                                <th>Terlambat</th>
-                                <th>Pulang Awal</th>
-                            </tr>
-                        </thead>
+                             <tr>
+                                 <th>Masuk</th>
+                                 <th>Pulang</th>
+                                 <th>Masuk</th>
+                                 <th>Pulang</th>
+                                 <th>Terlambat</th>
+                                 <th>Pulang Awal</th>
+                             </tr>
+                         </thead>
                      </table>
                  </div>
 
@@ -112,7 +112,6 @@
      <script src="/datatable/dataTables.fixedColumns.min.js"></script>
 
      <script>
-
          $(function() {
 
              loadFilterDataPegawaiBySo();
@@ -144,8 +143,8 @@
                  var filter_pegawai = $("#filter_pegawai").val();
                  var filter_bulan = $("#filter_bulan").val();
                  var filter_tahun = $("#filter_tahun").val();
-               
-                 loadTabelData(filter_pegawai,filter_bulan, filter_tahun);
+
+                 loadTabelData(filter_pegawai, filter_bulan, filter_tahun);
              });
 
              // on change filter_bulan
@@ -154,8 +153,8 @@
                  var filter_pegawai = $("#filter_pegawai").val();
                  var filter_bulan = $("#filter_bulan").val();
                  var filter_tahun = $("#filter_tahun").val();
-               
-                 loadTabelData(filter_pegawai,filter_bulan, filter_tahun);
+
+                 loadTabelData(filter_pegawai, filter_bulan, filter_tahun);
              });
 
              // on change filter_tahun
@@ -165,54 +164,56 @@
                  var filter_bulan = $("#filter_bulan").val();
                  var filter_tahun = $("#filter_tahun").val();
 
-                 loadTabelData(filter_pegawai,filter_bulan, filter_tahun);
+                 loadTabelData(filter_pegawai, filter_bulan, filter_tahun);
              });
 
 
              loadTabelData('', '', '');
 
              // load tabel
-             function loadTabelData(filter_pegawai,filter_bulan, filter_tahun){
+             function loadTabelData(filter_pegawai, filter_bulan, filter_tahun) {
                  $('.loader').show();
 
                  $('#tabel_master').DataTable().destroy();
 
                  var nip = filter_pegawai;
-                var month = filter_bulan;
-                var year = filter_tahun;
+                 var month = filter_bulan;
+                 var year = filter_tahun;
 
-                var max_day = 0;
-                if (month <= 7) {
-                    if (month == 2 && year % 4 == 0)
-                        max_day = 29;
-                    else if (month == 2 && year % 4 != 0)
-                        max_day = 28;
-                    else if (month % 2 == 0)
-                        max_day = 30;
-                    else
-                        max_day = 31;
+                 var max_day = 0;
+                 if (month <= 7) {
+                     if (month == 2 && year % 4 == 0)
+                         max_day = 29;
+                     else if (month == 2 && year % 4 != 0)
+                         max_day = 28;
+                     else if (month % 2 == 0)
+                         max_day = 30;
+                     else
+                         max_day = 31;
 
-                } else {
-                    if (month % 2 == 0)
-                        max_day = 31;
-                    else
-                        max_day = 30;
-                }
+                 } else {
+                     if (month % 2 == 0)
+                         max_day = 31;
+                     else
+                         max_day = 30;
+                 }
 
-                if (nip == "") {
-                    nip = "";
-                }
+                 if (nip == "") {
+                     nip = "";
+                 }
 
                  $.post('{{ URL::to('load-tabel-report-kehadiaran') }}', {
-                    nip,
-                    month,
-                    year,
-                    max_day,
+                     nip,
+                     month,
+                     year,
+                     max_day,
                      _token: '{{ csrf_token() }}'
                  }, function(e) {
                      var tabel = $("#tabel_master").DataTable({
                          "bDestroy": true,
-                         "buttons": ["excel", "pdf", "print"],
+                         @if (session('yt_print') == 'Y')
+                             "buttons": ["excel", "pdf", "print"],
+                         @endif
                          "ordering": false,
                          "autoWidth": false,
                          "searching": true,
@@ -229,8 +230,7 @@
                              left: 2,
                          },
                          "data": e,
-                         "columns": [
-                             {
+                         "columns": [{
                                  data: 'tanggal',
                                  className: "text-left",
                              },

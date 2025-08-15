@@ -53,11 +53,12 @@
                          <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
                          <div class="card-header">
-
-                             <div class="btn-group">
-                                 <button type="button" title="Add" data-btn="add"
-                                     class="add_edit_data btn btn-success"><i class="fa fa-add"></i> Add Data</button>
-                             </div>
+                             @if (session('yt_add') == 'Y')
+                                 <div class="btn-group">
+                                     <button type="button" title="Add" data-btn="add"
+                                         class="add_edit_data btn btn-success"><i class="fa fa-add"></i> Add Data</button>
+                                 </div>
+                             @endif
                          </div>
 
                          <div class="card-body">
@@ -207,7 +208,7 @@
                      </div>
 
                      <div class="modal-body">
-                        <div id="preview_dokumen"></div>
+                         <div id="preview_dokumen"></div>
                      </div>
 
                      <div class="modal-footer justify-content-between">
@@ -407,7 +408,9 @@
                      }, function(e) {
                          var tabel = $("#tabel_master").DataTable({
                              "bDestroy": true,
-                             "buttons": ["excel", "pdf", "print"],
+                             @if (session('yt_print') == 'Y')
+                                 "buttons": ["excel", "pdf", "print"],
+                             @endif
                              "ordering": false,
                              "autoWidth": false,
                              "searching": true,
@@ -665,8 +668,8 @@
 
                  //  modal_preview_dokumen
                  $(document).on("click", ".preview_dokumen", function(e) {
-                    var id = $(this).data('id');
-                    var jenis = $(this).data('jenis');
+                     var id = $(this).data('id');
+                     var jenis = $(this).data('jenis');
 
                      $.post('{{ URL::to('preview-dokumen') }}', {
                          id,

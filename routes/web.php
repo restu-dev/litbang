@@ -55,6 +55,8 @@ Route::get('/data-dashboard', [DashboardController::class, 'index'])->name('data
 Route::post('dashboard-tampil-data-absensi', [DashboardController::class, 'dashboardTampilDataAbsensi'])->name('dashboard-tampil-data-absens')->middleware('auth.web_or_admin');
 // dashboard-tampil-data-aktivitas
 Route::post('dashboard-tampil-data-aktivitas', [DashboardController::class, 'dashboardTampilDataAktivitas'])->name('dashboard-tampil-data-aktivitas')->middleware('auth.web_or_admin');
+// dashboard-tampil-data-agenda
+Route::post('dashboard-tampil-data-agenda', [DashboardController::class, 'dashboardTampilDataAgenda'])->name('dashboard-tampil-data-agenda')->middleware('auth.web_or_admin');
 // dashboard-tampil-data-chart-jml-aktivitas
 Route::post('dashboard-tampil-data-chart-jml-aktivitas', [DashboardController::class, 'dashboardTampilDataChartJmlAktivitas'])->name('dashboard-tampil-data-chart-jml-aktivitas')->middleware('auth.web_or_admin');
 Route::post('chart-jml-aktivitas', [DashboardController::class, 'chartJmlAktivitas'])->name('chart-jml-aktivitas')->middleware('auth.web_or_admin');
@@ -74,7 +76,7 @@ Route::post('/simpan-ubah-password', [DashboardController::class, 'simpanUbahPas
 // == kerja
 
 // program-kerja-tahunan
-Route::get('/program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'loadTabelProgramKerjaTahunan'])->name('load-tabel-program-kerja-tahunan');
 Route::post('simpan-program-kerja-tahunan', [ProgramKerjaTahunanController::class, 'simpanProgramKerjaTahunan']);
 Route::post('get-data-edit-program-kerja-tahunan-by-id', [ProgramKerjaTahunanController::class, 'getDataEditProgramKerjaTahunanById']);
@@ -87,13 +89,13 @@ Route::post('proses-imports-program-kerja-tahunan', [ProgramKerjaTahunanControll
 
 
 // approval
-Route::get('/coba', [ApprovalController::class, 'coba'])->middleware('auth.web_or_admin');
-Route::get('/approval', [ApprovalController::class, 'index'])->middleware('auth.web_or_admin');
+// Route::get('/coba', [ApprovalController::class, 'coba'])->middleware('auth.web_or_admin');
+Route::get('/approval', [ApprovalController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-approval', [ApprovalController::class, 'loadTabelProgramKerjaTahunanApprov'])->name('load-tabel-approval');
 Route::post('simpan-approval', [ApprovalController::class, 'simpanApproval']);
 
 // jurnal-harian
-Route::get('/jurnal-harian', [JurnalHarianController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/jurnal-harian', [JurnalHarianController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-jurnal-harian', [JurnalHarianController::class, 'loadTabelJurnalHarian'])->name('load-tabel-jurnal-harian');
 Route::post('simpan-jurnal-harian', [JurnalHarianController::class, 'simpanJurnalHarian']);
 Route::post('get-data-edit-jurnal-harian-by-id', [JurnalHarianController::class, 'getDataEditJurnalHarianById']);
@@ -104,57 +106,58 @@ Route::post('preview-dokumen', [JurnalHarianController::class, 'previewDokumen']
 // == agenda
 
 // agenda
-Route::get('/agenda', [AgendaController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/agenda', [AgendaController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::get('/agenda-events', [AgendaController::class, 'events'])->middleware('auth.web_or_admin');
 Route::post('/agenda/store', [AgendaController::class, 'store'])->middleware('auth.web_or_admin');
 Route::get('/agenda/{id}', [AgendaController::class, 'show'])->middleware('auth.web_or_admin');
 Route::post('/agenda/update/{id}', [AgendaController::class, 'update'])->middleware('auth.web_or_admin');
 Route::post('/agenda/delete/{id}', [AgendaController::class, 'destroy'])->middleware('auth.web_or_admin');
+Route::post('/agenda/list-agenda', [AgendaController::class, 'listAgenda'])->middleware('auth.web_or_admin');
 
 
 // == reporting
 
 // report-program-tahunan
-Route::get('/report-program-tahunan', [ReportProgramKerjaTahunanController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/report-program-tahunan', [ReportProgramKerjaTahunanController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-report-program-tahunan', [ReportProgramKerjaTahunanController::class, 'loadTabelReportProgramKerjaTahunan'])->name('load-tabel-report-program-tahunan');
 
 // report-jurnal-harian
-Route::get('/report-jurnal-harian', [ReportJurnalHarianController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/report-jurnal-harian', [ReportJurnalHarianController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-report-jurnal-harian', [ReportJurnalHarianController::class, 'loadTabelReportJurnalHarian'])->name('load-tabel-report-jurnal-harian');
 
 // report-kehadiaran
-Route::get('/report-kehadiaran', [ReportKehadiranController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/report-kehadiaran', [ReportKehadiranController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-report-kehadiaran', [ReportKehadiranController::class, 'loadTabelReportKehadiran'])->name('load-tabel-report-kehadiaran');
 
 
 // == master 
 
 // master-tahun-pelajaran
-Route::get('/master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'loadTabelMasterTahunPelajaran'])->name('load-tabel-master-tahun-pelajaran');
 Route::post('store-master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'store']);
 Route::post('destroy-master-tahun-pelajaran', [MasterTahunPelajaranController::class, 'destroy']);
 
 // master_bidang
-Route::get('/master-bidang', [MasterBidangController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/master-bidang', [MasterBidangController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-master-bidang', [MasterBidangController::class, 'loadTabelMasterBidang'])->name('load-tabel-master-bidang');
 Route::post('store-master-bidang', [MasterBidangController::class, 'store']);
 Route::post('destroy-master-bidang', [MasterBidangController::class, 'destroy']);
 
 // master-jenis-kegiatan
-Route::get('/master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'loadTabelMasterJenisKegiatan'])->name('load-tabel-master-jenis-kegiatan');
 Route::post('store-master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'store']);
 Route::post('destroy-master-jenis-kegiatan', [MasterJenisKegiatanController::class, 'destroy']);
 
 // master-status-pencapaian
-Route::get('/master-status-pencapaian', [MasterStatusPencapaianController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/master-status-pencapaian', [MasterStatusPencapaianController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-master-status-pencapaian', [MasterStatusPencapaianController::class, 'loadTabelMasterStatusPencapaian'])->name('load-tabel-master-status-pencapaian');
 Route::post('store-master-status-pencapaian', [MasterStatusPencapaianController::class, 'store']);
 Route::post('destroy-master-status-pencapaian', [MasterStatusPencapaianController::class, 'destroy']);
 
 // master-mapping-user-agenda
-Route::get('/master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');
 Route::post('load-tabel-master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'loadTabelMasterMappingUserAgenda'])->name('load-tabel-master-mapping-user-agenda');
 Route::post('store-master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'store']);
 Route::post('destroy-master-mapping-user-agenda', [MasterMappingUserAgendaController::class, 'destroy']);
@@ -221,20 +224,20 @@ Route::get('/reload-captcha', [LoginController::class, 'reloadCaptcha']);
 // Route::post('admin/load-tabel-registrasi-awal', [RegistrasiAwalController::class, 'loadTabelRegistrasiAwal'])->name('load-tabel-registrasi-awal')->middleware('admin');
 
 // level
-Route::get('/admin/level', [LevelController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/admin/level', [LevelController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');;
 Route::post('admin/load-tabel-level', [LevelController::class, 'loadTabelLevel'])->name('load-tabel-level');
 Route::post('admin/store-level', [LevelController::class, 'store']);
 Route::post('admin/destroy-level', [LevelController::class, 'destroy']);
 
 // user
-Route::get('/admin/user', [UserController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/admin/user', [UserController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');;
 Route::post('admin/load-tabel-user', [UserController::class, 'loadTabelUser'])->name('load-tabel-user');
 Route::post('admin/hapus-akses', [UserController::class, 'hapusAkses']);
 Route::post('admin/simpan-level-user', [UserController::class, 'simpanLevelUser']);
 Route::post('admin/simpan-bidang-user', [UserController::class, 'simpanBidangUser']);
 
 // user-non-civitas
-Route::get('/user-non-civitas', [UserNonCivitasController::class, 'index'])->middleware('auth.web_or_admin');
+Route::get('/user-non-civitas', [UserNonCivitasController::class, 'index'])->middleware('auth.web_or_admin')->middleware('cekmenuakses');;
 Route::post('load-tabel-user-non-civitas', [UserNonCivitasController::class, 'loadTabelUserNonCivitas'])->name('load-tabel-user-non-civitas');
 Route::post('store-user-non-civitas', [UserNonCivitasController::class, 'store']);
 Route::post('destroy-user-non-civitas', [UserNonCivitasController::class, 'destroy']);

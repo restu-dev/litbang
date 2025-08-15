@@ -50,13 +50,14 @@
                               <th>No</th>
                               <th>Aksi</th>
                               <th>Approvement</th>
+                              <th>Ket Approvement</th>
                               <th>Program Kerja</th>
                               <th>Tahun</th>
                               <th>Penanggung Jawab</th>
                               <th>Target Frekuensi Tahunan</th>
                               <th>Indikator Kinerja</th>
                               <th>Capaian Aktual</th>
-                              <th>Pro Capaian</th>
+                              <th>Prosentase Capaian</th>
                               <th>Status Capaian</th>
                               <th>Keterangan</th>
                           </tr>
@@ -143,6 +144,12 @@
                           <option value="Ya">Ya</option>
                           <option value="Tidak">Tidak</option>
                       </select>
+                  </div>
+
+                  {{-- keterangan_approve --}}
+                  <div class="form-group">
+                      <label for="keterangan_approve">Keterangan Approve</label>
+                      <textarea name="keterangan_approve" id="keterangan_approve" class="form-control" placeholder="Input Keterangan Approve"></textarea>
                   </div>
 
               </div>

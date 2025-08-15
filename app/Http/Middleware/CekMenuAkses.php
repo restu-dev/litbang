@@ -47,6 +47,7 @@ class CekMenuAkses
 
             if ($ada > 0) {
                 // set session
+
                 foreach ($data as $d) {
                     session()->put('yt_add', $d->yt_add);
                     session()->put('yt_edit', $d->yt_edit);
@@ -80,6 +81,7 @@ class CekMenuAkses
             $ada = count($data);
 
             if ($ada > 0) {
+
                 // set session
                 foreach ($data as $d) {
                     session()->put('yt_add', $d->yt_add);

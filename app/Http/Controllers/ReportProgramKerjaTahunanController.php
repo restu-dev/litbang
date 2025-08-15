@@ -218,6 +218,10 @@ class ReportProgramKerjaTahunanController extends Controller
         for ($i = 0; $i < count($data); $i++) {
             $id = $data[$i]->id;
 
+            $pro_capaian = $data[$i]->pro_capaian;
+
+            $data[$i]->pro_capaian = $pro_capaian . ' %';
+
             $data[$i]->nama_pegawai = $data[$i]->nama_pegawai??$data[$i]->penanggung_jawab.'(Non Civitas)';
         }
 

@@ -143,28 +143,47 @@ class ApprovalController extends Controller
 
             $data[$i]->pro_capaian = $pro_capaian . ' %';
 
-            $data[$i]->nama_pegawai = $data[$i]->nama_pegawai??$data[$i]->penanggung_jawab.'(Non Civitas)';
+            $data[$i]->nama_pegawai = $data[$i]->nama_pegawai ?? $data[$i]->penanggung_jawab . '(Non Civitas)';
+
+            $yt_add = session('yt_add');
 
             if ($approvement == "Ya") {
-                $aksi = "<div class='btn-group'>
-                      <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-success btn-sm add_edit_data'>
-                       <i class='fas fa-check'></i>
-                      </button>
-                    </div>";
-            } else if ($approvement == "Tidak") {
-                $aksi = "<div class='btn-group'>
-                      <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-danger btn-sm add_edit_data'>
-                       <i class='fas fa-close'></i>
-                      </button>
-                    </div>";
-            } else {
-                $aksi = "<div class='btn-group'>
-                      <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-warning btn-sm add_edit_data'>
-                       <i class='fas fa-edit'></i>
-                      </button>
-                    </div>";
-            }
 
+                $btn = "";
+                if ($yt_add == "Y") {
+                    $btn = "<button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-success btn-sm add_edit_data'>
+                                <i class='fas fa-check'></i>
+                            </button>";
+                }
+
+                $aksi = "<div class='btn-group'>
+                           $btn
+                        </div>";
+            } else if ($approvement == "Tidak") {
+
+                $btn = "";
+                if ($yt_add == "Y") {
+                    $btn = "<button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-danger btn-sm add_edit_data'>
+                                <i class='fas fa-close'></i>
+                            </button>";
+                }
+
+                $aksi = "<div class='btn-group'>
+                           $btn
+                        </div>";
+            } else {
+
+                $btn = "";
+                if ($yt_add == "Y") {
+                    $btn = "<button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Approval' type='button' class='btn btn-warning btn-sm add_edit_data'>
+                                <i class='fas fa-edit'></i>
+                            </button>";
+                }
+
+                $aksi = "<div class='btn-group'>
+                           $btn
+                        </div>";
+            }
 
 
             $data[$i]->aksi = $aksi;
@@ -177,6 +196,7 @@ class ApprovalController extends Controller
     {
         $data = [
             'approvement' => $request->approvement,
+            'keterangan_approve' => $request->keterangan_approve
         ];
 
         $nama_pegawai = session('no_pegawai');

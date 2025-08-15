@@ -88,13 +88,26 @@ class JurnalHarianController extends Controller
         for($i=0;$i<count($data);$i++){
             $id = $data[$i]->id;
 
+            $yt_edit = session('yt_edit');
+            $yt_del = session('yt_del');
+
+            $edit="";
+            if($yt_edit=="Y"){
+                $edit = "<button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm add_edit_data'>
+                            <i class='fas fa-edit'></i>
+                         </button>";
+            }
+
+            $hapus="";
+            if($yt_del=="Y"){
+                $hapus = "<button data-id='$id' data-toggle='tooltip' data-placement='top' title='Delete' class='btn btn-danger btn-sm hapus_data'>
+                            <i class='fa fa-trash'></i>
+                          </button>";
+            }
+
             $aksi = "<div class='btn-group'>
-                      <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm add_edit_data'>
-                       <i class='fas fa-edit'></i>
-                      </button>
-                      <button data-id='$id' data-toggle='tooltip' data-placement='top' title='Delete' class='btn btn-danger btn-sm hapus_data'>
-                        <i class='fa fa-trash'></i>
-                      </button>
+                        $edit
+                        $hapus
                      </div>";
 
             $file_dokumen = $data[$i]->file_dokumen;

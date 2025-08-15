@@ -22,18 +22,32 @@ class MasterTahunPelajaranController extends Controller
         $data = MasterTahunPelajaran::get();
 
         for($i=0;$i<count($data);$i++){
+            
             $id = $data[$i]->id;
             $nama = $data[$i]->nama;
             $awal = $data[$i]->awal;
             $akhir = $data[$i]->akhir;
 
+            $yt_edit = session('yt_edit');
+            $yt_del = session('yt_del');
+
+            $edit="";
+            if($yt_edit=="Y"){
+                $edit = "<button data-id='$id' data-nama='$nama' data-awal='$awal' data-akhir='$akhir' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm edit_master'>
+                            <i class='fas fa-edit'></i>
+                         </button>";
+            }
+
+            $hapus="";
+            if($yt_del=="Y"){
+                $hapus = "<button data-id='$id' data-toggle='tooltip' data-placement='top' title='Delete' class='btn btn-danger btn-sm hapus_master'>
+                                <i class='fa fa-trash'></i>
+                          </button>";
+            }
+
             $aksi = "<div class='btn-group'>
-                      <button data-id='$id' data-nama='$nama' data-awal='$awal' data-akhir='$akhir' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm edit_master'>
-                       <i class='fas fa-edit'></i>
-                      </button>
-                      <button data-id='$id' data-toggle='tooltip' data-placement='top' title='Delete' class='btn btn-danger btn-sm hapus_master'>
-                        <i class='fa fa-trash'></i>
-                      </button>
+                     $edit
+                      $hapus
                      </div>";
 
             $data[$i]->aksi=$aksi;

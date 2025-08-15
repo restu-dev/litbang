@@ -21,7 +21,6 @@
 
              </div>
          </div>
-
      </div>
 
      <div class="row">
@@ -47,6 +46,20 @@
                          </div>
                      @endif
                      <div id="tampil_data_aktivitas"></div>
+                 </div>
+             </div>
+
+             <div class="card">
+                 <div id="loader_data_agenda" class="overlay">
+                     <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                 </div>
+
+                 <div class="card-header">
+                     <h3 class="card-title">Agenda</h3>
+                 </div>
+
+                 <div class="card-body">
+                     <div id="tampil_data_agenda"></div>
                  </div>
              </div>
          </div>
@@ -133,6 +146,7 @@
 
              tampilDataAbsensi();
              tampilDataAktivitas('');
+             tampilDataAgenda();
              tampilDataChartJmlAktivitas('', '', '', '', '')
 
              // tampil_data_absensi
@@ -161,6 +175,19 @@
                  }).done(function(data) {
                      $('#loader_data_aktivitas').hide();
                  });
+             }
+
+             // tampil_data_agenda
+             function tampilDataAgenda() {
+                 $('#loader_data_agenda').show();
+
+                 $.post('{{ URL::to('dashboard-tampil-data-agenda') }}', {
+                     _token: '{{ csrf_token() }}'
+                 }, function(e) {
+                     $("#tampil_data_agenda").html(e);
+                 }).done(function(data) {
+                     $('#loader_data_agenda').hide();
+                 })
              }
 
              // tampil_data_chart_jml_aktivitas

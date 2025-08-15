@@ -6,35 +6,35 @@
  @endsection
 
  @section('content')
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
-                <div class="card-body">
-                    <form>
-                        <div class="row g-2">
-                            {{-- filter tahun --}}
-                            <div class="col-12 col-md-3">
-                                <select id="filter_tahun_pelajaran" class="form-control select2" style="width: 100%;">
-                                </select>
-                            </div>
+     <div class="row">
+         <div class="col-12">
+             <div class="card">
+                 <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+                 <div class="card-body">
+                     <form>
+                         <div class="row g-2">
+                             {{-- filter tahun --}}
+                             <div class="col-12 col-md-3">
+                                 <select id="filter_tahun_pelajaran" class="form-control select2" style="width: 100%;">
+                                 </select>
+                             </div>
 
-                            @if (Auth::guard('admin')->check())
-                                {{-- filter bidang --}}
-                                {{-- <div class="col-12 col-md-3">
+                             @if (Auth::guard('admin')->check())
+                                 {{-- filter bidang --}}
+                                 {{-- <div class="col-12 col-md-3">
                                     <select id="filter_bidang" class="form-control select2" style="width: 100%;">
                                     </select>
                                 </div> --}}
-                            @endif
+                             @endif
 
-                            {{-- filter status --}}
-                            <div class="col-12 col-md-3">
-                                <select id="filter_status_capaian" class="form-control select2" style="width: 100%;">
-                                </select>
-                            </div>
+                             {{-- filter status --}}
+                             <div class="col-12 col-md-3">
+                                 <select id="filter_status_capaian" class="form-control select2" style="width: 100%;">
+                                 </select>
+                             </div>
 
-                            {{-- filter approvement --}}
-                            {{-- 
+                             {{-- filter approvement --}}
+                             {{-- 
                             <div class="col-12 col-md-3">
                                 <select id="filter_approvement" class="form-control select2" style="width: 100%;">
                                     <option value="">-Approvement-</option>
@@ -44,12 +44,12 @@
                                 </select>
                             </div> 
                             --}}
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+                         </div>
+                     </form>
+                 </div>
+             </div>
+         </div>
+     </div>
 
      <div class="row">
          <div class="col-lg-12">
@@ -71,7 +71,7 @@
                                  <th>Target Frekuensi Tahunan</th>
                                  <th>Indikator Kinerja</th>
                                  <th>Capaian Aktual</th>
-                                 <th>Pro Capaian</th>
+                                 <th>Prosentase Capaian</th>
                                  <th>Status Capaian</th>
                                  <th>Keterangan</th>
                                  <th>Approvement</th>
@@ -226,7 +226,9 @@
                  }, function(e) {
                      var tabel = $("#tabel_master").DataTable({
                          "bDestroy": true,
-                         "buttons": ["excel", "pdf", "print"],
+                         @if (session('yt_print') == 'Y')
+                             "buttons": ["excel", "pdf", "print"],
+                         @endif
                          "ordering": false,
                          "autoWidth": false,
                          "searching": true,

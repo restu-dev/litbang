@@ -71,23 +71,25 @@
                      <div class="card-header">
 
                          <div class="btn-group">
-                             <button type="button" title="Add" data-btn="add" class="add_edit_data btn btn-success"><i
-                                     class="fa fa-add"></i> Add Data</button>
+                             @if (session('yt_add') == 'Y')
+                                 <button type="button" title="Add" data-btn="add"
+                                     class="add_edit_data btn btn-success"><i class="fa fa-add"></i> Add Data</button>
 
-                             <button id="impor_data" type="button" title="Impor Template" class="btn btn-primary"><i
-                                     class="fa fa-upload"></i> Impor data</button>
+                                 <button id="impor_data" type="button" title="Impor Template" class="btn btn-primary"><i
+                                         class="fa fa-upload"></i> Impor data</button>
 
-                             @if ($id_tahun_ajaran_lalu && !$sudahAdaProgramKerja)
-                                 <form method="POST" action="clone-program-kerja"
-                                     onsubmit="return confirm('Yakin ingin menyalin program kerja dari tahun ajaran {{ $nama_tahun_ajaran_lalu }}?');">
-                                     @csrf
-                                     <input type="hidden" name="id_tahun_sekarang" value="{{ $id_tahun_ajaran }}">
-                                     <input type="hidden" name="id_tahun_lalu" value="{{ $id_tahun_ajaran_lalu }}">
-                                     <button style="border-radius: 0;" type="submit" class="btn btn-warning">
-                                         📋 Ambil dari Program Kerja Tahun Lalu:
-                                         <strong>{{ $nama_tahun_ajaran_lalu }}</strong>
-                                     </button>
-                                 </form>
+                                 @if ($id_tahun_ajaran_lalu && !$sudahAdaProgramKerja)
+                                     <form method="POST" action="clone-program-kerja"
+                                         onsubmit="return confirm('Yakin ingin menyalin program kerja dari tahun ajaran {{ $nama_tahun_ajaran_lalu }}?');">
+                                         @csrf
+                                         <input type="hidden" name="id_tahun_sekarang" value="{{ $id_tahun_ajaran }}">
+                                         <input type="hidden" name="id_tahun_lalu" value="{{ $id_tahun_ajaran_lalu }}">
+                                         <button style="border-radius: 0;" type="submit" class="btn btn-warning">
+                                             📋 Ambil dari Program Kerja Tahun Lalu:
+                                             <strong>{{ $nama_tahun_ajaran_lalu }}</strong>
+                                         </button>
+                                     </form>
+                                 @endif
                              @endif
 
                          </div>
@@ -105,10 +107,11 @@
                                      <th>Target Frekuensi Tahunan</th>
                                      <th>Indikator Kinerja</th>
                                      <th>Capaian Aktual</th>
-                                     <th>Pro Capaian</th>
+                                     <th>Prosentase Capaian</th>
                                      <th>Status Capaian</th>
                                      <th>Keterangan</th>
                                      <th>Approvement</th>
+                                     <th>Ket Approvement</th>
                                  </tr>
                              </thead>
                          </table>
@@ -397,7 +400,9 @@
                      }, function(e) {
                          var tabel = $("#tabel_master").DataTable({
                              "bDestroy": true,
-                             "buttons": ["excel", "pdf", "print"],
+                             @if (session('yt_print') == 'Y')
+                                 "buttons": ["excel", "pdf", "print"],
+                             @endif
                              "ordering": false,
                              "autoWidth": false,
                              "searching": true,
@@ -463,6 +468,10 @@
                                  },
                                  {
                                      data: 'approvement',
+                                     className: "text-left",
+                                 },
+                                 {
+                                     data: 'keterangan_approve',
                                      className: "text-left",
                                  },
                              ]

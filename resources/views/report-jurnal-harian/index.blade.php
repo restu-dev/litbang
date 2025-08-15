@@ -6,55 +6,55 @@
  @endsection
 
  @section('content')
-    {{-- filter --}}
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
-                <div class="card-body">
-                    <form>
-                        <div class="row g-3">
-                            {{-- date range --}}
-                            <div class="col-12 col-md-3">
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="far fa-calendar-alt"></i>
-                                    </span>
-                                    <input type="text" class="form-control" id="filter_tgl" placeholder="Tanggal">
-                                </div>
-                            </div>
-                            {{-- filter ada_tidak_program_kerja --}}
-                            <div class="col-12 col-md-2">
-                                <select id="filter_ada_tidak_program_kerja" class="form-control select2"
-                                    style="width: 100%;">
-                                    <option value="">-Ada / Tidak Program-</option>
-                                    <option value="Y">Ada</option>
-                                    <option value="T">Tidak</option>
-                                </select>
-                            </div>
-                            @if (Auth::guard('admin')->check())
-                                {{-- filter_bidang --}}
-                                {{-- <div class="col-12 col-md-2">
+     {{-- filter --}}
+     <div class="row">
+         <div class="col-lg-12">
+             <div class="card">
+                 <div class="overlay loader"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+                 <div class="card-body">
+                     <form>
+                         <div class="row g-3">
+                             {{-- date range --}}
+                             <div class="col-12 col-md-3">
+                                 <div class="input-group">
+                                     <span class="input-group-text">
+                                         <i class="far fa-calendar-alt"></i>
+                                     </span>
+                                     <input type="text" class="form-control" id="filter_tgl" placeholder="Tanggal">
+                                 </div>
+                             </div>
+                             {{-- filter ada_tidak_program_kerja --}}
+                             <div class="col-12 col-md-2">
+                                 <select id="filter_ada_tidak_program_kerja" class="form-control select2"
+                                     style="width: 100%;">
+                                     <option value="">-Ada / Tidak Program-</option>
+                                     <option value="Y">Ada</option>
+                                     <option value="T">Tidak</option>
+                                 </select>
+                             </div>
+                             @if (Auth::guard('admin')->check())
+                                 {{-- filter_bidang --}}
+                                 {{-- <div class="col-12 col-md-2">
                                     <select id="filter_bidang" class="form-control select2" style="width: 100%;">
                                     </select>
                                 </div> --}}
-                            @endif
-                            {{-- filter_jenis_kegiatan --}}
-                            <div class="col-12 col-md-2">
-                                <select id="filter_jenis_kegiatan" class="form-control select2" style="width: 100%;">
-                                </select>
-                            </div>
-                            {{-- filter pencapaian --}}
-                            <div class="col-12 col-md-3">
-                                <select id="filter_status_pencapaian" class="form-control select2" style="width: 100%;">
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+                             @endif
+                             {{-- filter_jenis_kegiatan --}}
+                             <div class="col-12 col-md-2">
+                                 <select id="filter_jenis_kegiatan" class="form-control select2" style="width: 100%;">
+                                 </select>
+                             </div>
+                             {{-- filter pencapaian --}}
+                             <div class="col-12 col-md-3">
+                                 <select id="filter_status_pencapaian" class="form-control select2" style="width: 100%;">
+                                 </select>
+                             </div>
+                         </div>
+                     </form>
+                 </div>
+             </div>
+         </div>
+     </div>
 
      <div class="row">
          <div class="col-lg-12">
@@ -325,7 +325,9 @@
                  }, function(e) {
                      var tabel = $("#tabel_master").DataTable({
                          "bDestroy": true,
-                         "buttons": ["excel", "pdf", "print"],
+                         @if (session('yt_print') == 'Y')
+                             "buttons": ["excel", "pdf", "print"],
+                         @endif
                          "ordering": false,
                          "autoWidth": false,
                          "searching": true,

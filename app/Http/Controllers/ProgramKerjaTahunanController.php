@@ -42,10 +42,12 @@ class ProgramKerjaTahunanController extends Controller
 
         $adaProgramKerja = "";
         if ($id_tahun_ajaran) {
+
             $adaProgramKerja = DB::table('program_kerja_tahunan')
                 ->where('id_tahun_pelajaran', $id_tahun_ajaran)
                 ->where('penanggung_jawab', $no_pegawai)
                 ->exists();
+
         }
 
         return view('program-kerja-tahunan.index', [
@@ -247,13 +249,26 @@ class ProgramKerjaTahunanController extends Controller
 
             $data[$i]->pro_capaian = $pro_capaian . ' %';
 
+            $yt_edit = session('yt_edit');
+            $yt_del = session('yt_del');
+
+            $edit="";
+            if($yt_edit=="Y"){
+                $edit = "<button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm add_edit_data'>
+                            <i class='fas fa-edit'></i>
+                        </button>";
+            }
+
+            $hapus="";
+            if($yt_del=="Y"){
+                $hapus = "<button data-id='$id' data-toggle='tooltip' data-placement='top' title='Delete' class='btn btn-danger btn-sm hapus_data'>
+                            <i class='fa fa-trash'></i>
+                         </button>";
+            }
+
             $aksi = "<div class='btn-group'>
-                      <button data-id='$id' data-btn='edit' data-toggle='tooltip' data-placement='top' title='Edit' type='button' class='btn btn-info btn-sm add_edit_data'>
-                       <i class='fas fa-edit'></i>
-                      </button>
-                      <button data-id='$id' data-toggle='tooltip' data-placement='top' title='Delete' class='btn btn-danger btn-sm hapus_data'>
-                        <i class='fa fa-trash'></i>
-                      </button>
+                     $edit
+                     $hapus
                      </div>";
 
             $data[$i]->aksi = $aksi;
@@ -360,6 +375,8 @@ class ProgramKerjaTahunanController extends Controller
         $data['id_status_capaian'] = $data->id_status_capaian;
         $data['keterangan'] = $data->keterangan;
         $data['approvement'] = $data->approvement;
+
+        $data['keterangan_approve'] = $data->keterangan_approve;
 
         return $data;
     }

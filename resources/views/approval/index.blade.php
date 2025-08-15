@@ -3,18 +3,17 @@
  @section('content')
      @if ($tahunAjar)
          @if ($ada_struktur == 'T')
-             @if (session('nama_level')=='Ketua Harian' || session('nama_level')=='Kepala Biro')
-                @include('approval.partials.content')
+             @if (session('nama_level') == 'Ketua Harian' || session('nama_level') == 'Kepala Biro')
+                 @include('approval.partials.content')
              @else
-                <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h5><i class="icon fas fa-ban"></i> Peringatan !</h5>
-                    User tidak memiliki struktur dibawahnya..
-                </div>
+                 <div class="alert alert-danger alert-dismissible">
+                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                     <h5><i class="icon fas fa-ban"></i> Peringatan !</h5>
+                     User tidak memiliki struktur dibawahnya..
+                 </div>
              @endif
-
          @else
-            @include('approval.partials.content')
+             @include('approval.partials.content')
          @endif
      @else
          <div class="alert alert-danger">
@@ -164,7 +163,9 @@
                      }, function(e) {
                          var tabel = $("#tabel_master").DataTable({
                              "bDestroy": true,
-                             "buttons": ["excel", "pdf", "print"],
+                             @if (session('yt_print') == 'Y')
+                                 "buttons": ["excel", "pdf", "print"],
+                             @endif
                              "ordering": false,
                              "autoWidth": false,
                              "searching": true,
@@ -194,6 +195,10 @@
                                  },
                                  {
                                      data: 'approvement',
+                                     className: "text-left",
+                                 },
+                                 {
+                                     data: 'keterangan_approve',
                                      className: "text-left",
                                  },
                                  {
@@ -232,7 +237,7 @@
                                      data: 'keterangan',
                                      className: "text-left",
                                  },
-                                
+
                              ]
                          }).buttons().container().appendTo('#tabel_master_wrapper .col-md-6:eq(0)');
 
@@ -282,7 +287,11 @@
                              $("#program_kerja").val(e.program_kerja);
                              $("#target_frekuensi_tahunan").val(e.target_frekuensi_tahunan);
                              $("#indikator_kinerja").val(e.indikator_kinerja);
-                             $("#keterangan").val(e.indikator_kinerja);
+                             $("#keterangan").val(e.keterangan);
+
+                             $("#keterangan_approve").val(e.keterangan_approve);
+
+                             
 
                              $("#approvement").val(e.approvement).trigger("change");
                          });
@@ -300,6 +309,7 @@
                      var id = $("#id").val();
 
                      var approvement = $("#approvement").val();
+                     var keterangan_approve = $("#keterangan_approve").val();
 
                      if (approvement == "") {
                          tampilPesan('warning', ' Approvement tidak boleh kosong!');
@@ -311,6 +321,7 @@
                              data: {
                                  id,
                                  approvement,
+                                 keterangan_approve,
                                  _token: '{{ csrf_token() }}'
                              },
                              success: function(result) {

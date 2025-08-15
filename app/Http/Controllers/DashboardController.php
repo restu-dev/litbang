@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Http\Repositories\HelperRepositories;
 use App\Models\MasterTahunPelajaran;
+use Illuminate\Support\Carbon;
+
 
 class DashboardController extends Controller
 {
@@ -289,6 +291,28 @@ class DashboardController extends Controller
 
 
         return view('dashboard.partials.tampil_data_aktivitas', compact('data'));
+    }
+
+    // dashboardTampilDataAgenda
+    public function dashboardTampilDataAgenda(Request $request)
+    {
+        $hariIni = Carbon::now()->toDateString();
+
+        $tahunAjar = DB::table('master_tahun_pelajaran')
+            ->whereDate('awal', '<=', $hariIni)
+            ->whereDate('akhir', '>=', $hariIni)
+            ->first();
+
+        $id_tahun_ajaran = $tahunAjar ? $tahunAjar->id : null;
+
+        $data = DB::table('agenda')
+            ->join('master_bidang', 'agenda.id_bidang', '=', 'master_bidang.id')
+            ->select('agenda.*', 'master_bidang.nama as nama_bidang')
+            ->where('agenda.id_tahun_pelajaran', $id_tahun_ajaran)
+            ->orderBy('agenda.tgl_awal', 'desc')
+            ->get();
+
+        return view('dashboard.partials.tampil_data_agenda', compact('data'));
     }
 
     // dashboardTampilDataChartJmlAktivitas

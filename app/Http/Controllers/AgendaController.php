@@ -154,4 +154,37 @@ class AgendaController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function listAgenda()
+    {
+        $hariIni = Carbon::now()->toDateString();
+
+        $tahunAjar = DB::table('master_tahun_pelajaran')
+            ->whereDate('awal', '<=', $hariIni)
+            ->whereDate('akhir', '>=', $hariIni)
+            ->first();
+
+        $id_tahun_ajaran = $tahunAjar ? $tahunAjar->id : null;
+
+        $agendas = DB::table('agenda')
+            ->join('master_bidang', 'agenda.id_bidang', '=', 'master_bidang.id')
+            ->select('agenda.*', 'master_bidang.nama as nama_bidang')
+            ->where('agenda.id_tahun_pelajaran', $id_tahun_ajaran)
+            ->orderBy('agenda.tgl_awal', 'desc')
+            ->get();
+
+        for($i=0; $i<count($agendas);$i++){
+            $tgl_awal = Carbon::parse($agendas[$i]->tgl_awal)->format('d-m-Y');
+            $tgl_akhir = $agendas[$i]->tgl_akhir ? Carbon::parse($agendas[$i]->tgl_akhir)->format('d-m-Y') : '-';
+
+            $agendas[$i]->tgl_awal = $tgl_awal;
+            $agendas[$i]->tgl_akhir = $tgl_akhir;
+
+            if($agendas[$i]->jenis == 'semua'){
+                $agendas[$i]->nama_bidang = '(Semua Bidang)';
+            }
+        }
+
+        return $agendas;
+    }
 }
